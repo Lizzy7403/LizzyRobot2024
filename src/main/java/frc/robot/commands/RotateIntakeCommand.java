@@ -1,15 +1,15 @@
 package frc.robot.commands;
 
-// Importing the CommandBase class from the WPILib library
+// Importing the Command class from the WPILib library
 // This class provides the base for creating commands, which are actions that the robot can perform
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 // Importing the Intake class from the robot's code
 // This class represents the intake subsystem of the robot
 import frc.robot.subsystems.Intake;
 
 // The RotateIntakeCommand class represents a command to rotate the intake
-public class RotateIntakeCommand extends CommandBase {
+public class RotateIntakeCommand extends Command {
 
     // The intake subsystem that this command will operate on
     private final Intake intake;
