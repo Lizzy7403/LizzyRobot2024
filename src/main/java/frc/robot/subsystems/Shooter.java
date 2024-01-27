@@ -1,17 +1,17 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
 // Importing the CANSparkMax class from the REV Robotics library
 // This class provides methods to control the Spark MAX motor controller
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 // Importing the MotorType enum from the REV Robotics library
 // This enum provides constants to specify the type of motor (brushed or brushless)
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 // Importing the SubsystemBase class from the WPILib library
 // This class provides the base for creating subsystems, which are major parts of the robot
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 // Importing the Constants class from the robot's code
 // This class contains constant values used throughout the robot's code
 import frc.robot.Constants;
@@ -31,12 +31,12 @@ public class Shooter extends SubsystemBase {
   // This is called when a Shooter object is created
   public Shooter() {
     // Initializing the first shooter motor with its ID and specifying that it's a brushless motor
-    shooterMotor1 = new CANSparkMax(Constants.ShooterConstants.MOTOR_1_ID, MotorType.kBrushless);
+    shooterMotor1 = new CANSparkMax(Constants.ShooterConstants.MOTOR_1_ID, CANSparkLowLevel.MotorType.kBrushless);
 
     // Initializing the second shooter motor with its ID and specifying that it's a brushless motor
-    shooterMotor2 = new CANSparkMax(Constants.ShooterConstants.MOTOR_2_ID, MotorType.kBrushless);
+    shooterMotor2 = new CANSparkMax(Constants.ShooterConstants.MOTOR_2_ID, CANSparkLowLevel.MotorType.kBrushless);
 
-    shooterMotor2.follow(shooterMotor1);
+    shooterMotor2.follow(shooterMotor1, true);
   }
 
   // Method to set the speed of the shooter motors
