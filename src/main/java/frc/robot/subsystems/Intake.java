@@ -10,14 +10,15 @@ import com.revrobotics.RelativeEncoder;
 
 // Importing the SparkMaxPIDController class from the REV Robotics library
 // This class provides methods to control a motor using PID
-import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 // Importing the ControlType enum from the REV Robotics library
 // This enum provides constants to specify the control type for the PID controller
 
 // Importing the MotorType enum from the REV Robotics library
 // This enum provides constants to specify the type of motor (brushed or brushless)
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,7 +43,7 @@ public class Intake extends SubsystemBase {
 
   // The PID controller for the rotation motor
   // This is used to control the position of the intake
-  private SparkMaxPIDController m_pidRotateController;
+  private SparkPIDController m_pidRotateController;
 
   // The encoder for the rotation motor
   // This is used to get the position and velocity of the intake

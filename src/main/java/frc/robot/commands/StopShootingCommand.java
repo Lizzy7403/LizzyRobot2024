@@ -1,15 +1,15 @@
 package frc.robot.commands;
 
-// Importing the CommandBase class from the WPILib library
+// Importing the Command class from the WPILib library
 // This class provides the base for creating commands, which are actions that the robot can perform
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 // Importing the Shooter class from the robot's code
 // This class represents the shooter subsystem of the robot
 import frc.robot.subsystems.Shooter;
 
 // The StopShootingCommand class represents a command to stop the shooter
-public class StopShootingCommand extends CommandBase {
+public class StopShootingCommand extends Command {
 
     // The shooter subsystem that this command will operate on
     private final Shooter shooter;
