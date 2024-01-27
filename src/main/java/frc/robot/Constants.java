@@ -1,10 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-
 public final class Constants {
 
     public static final class IntakeConstants
@@ -63,7 +58,8 @@ public final class Constants {
         public static final double kPMoving = 0.1;
         public static final double kIMoving = 0.0;
         public static final double kDMoving = 0.0;
-        public static final double kFMoving = 0.0;
+        public static final double kIzMoving = 0.0;
+        public static final double kFFMoving = 0.0;
 
         public static final double kPHolding = 0.1;
         public static final double kIHolding = 0.0;
