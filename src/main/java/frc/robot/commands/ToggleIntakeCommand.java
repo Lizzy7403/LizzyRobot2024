@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 // Importing the CommandBase class from the WPILib library
 // This class provides the base for creating commands, which are actions that the robot can perform
-import edu.wpi.first.wpilibj2.command.CommandBase;
 
 // Importing the Intake class from the robot's code
 // This class represents the intake subsystem of the robot
@@ -12,7 +11,9 @@ import frc.robot.subsystems.Intake;
 // These interfaces represent a supplier of boolean values and a block of code to run, respectively
 import java.util.function.BooleanSupplier;
 
-public class ToggleIntakeCommand extends CommandBase {
+import edu.wpi.first.wpilibj2.command.Command;
+
+public class ToggleIntakeCommand extends Command {
 
     // The intake subsystem that this command will operate on
     private final Intake intake;
