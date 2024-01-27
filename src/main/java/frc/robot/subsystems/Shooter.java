@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 // Importing the CANSparkMax class from the REV Robotics library
 // This class provides methods to control the Spark MAX motor controller
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
 // Importing the MotorType enum from the REV Robotics library
 // This enum provides constants to specify the type of motor (brushed or brushless)

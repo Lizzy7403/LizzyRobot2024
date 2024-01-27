@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.*;
-import com.ctre.*;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
