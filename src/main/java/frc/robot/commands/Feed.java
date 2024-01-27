@@ -1,15 +1,15 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 // Importing the CommandBase class from the WPILib library
 // This class provides the base for creating commands, which are actions that the robot can perform
-import edu.wpi.first.wpilibj2.command.CommandBase;
 
 // Importing the Intake class from the robot's code
 // This class represents the intake subsystem of the robot
 import frc.robot.subsystems.Intake;
 
 // The SpinIntakeCommand class represents a command to spin the intake
-public class Feed extends CommandBase {
+public class Feed extends Command {
 
     // The intake subsystem that this command will operate on
     private final Intake intake;
