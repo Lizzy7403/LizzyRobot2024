@@ -29,10 +29,10 @@ public final class Constants {
     public static final class ShooterConstants 
      {
 
-        public static final int MOTOR_1_ID = 18;
-        public static final int MOTOR_2_ID = 19;
+        public static final int MOTOR_1_ID = 19;  //MAKE SURE TO SWAP THE ID AGAIN
+        public static final int MOTOR_2_ID = 18;
         //max output at shooter class
-        public static final double kMaxAbsOutput = 0.3;
+        public static final double kMaxAbsOutput = 1;
         //max output at robot container class for high shot
         public static final double kMaxAbsOutputRBHigh = .3;
         //max output at robot container class for low shot

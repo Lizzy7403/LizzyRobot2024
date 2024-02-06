@@ -15,9 +15,14 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ShootCommand;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Shooter;
 
 public class RobotContainer {
+
+  private final Shooter sh = new Shooter();
+
   
    /* Setting up bindings for necessary control of the swerve drive platform */
   private final PS4Controller joystick = new PS4Controller(Constants.PS4GamePad.joystickPort);
@@ -55,6 +60,9 @@ public class RobotContainer {
     // reset the field-centric heading on Option Button pressed 
     JoystickButton resetHeading = new JoystickButton(joystick, PS4Controller.Button.kOptions.value);
     resetHeading.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+
+    JoystickButton shoot = new JoystickButton(joystick,PS4Controller.Button.kR2.value);
+    shoot.whileTrue(new ShootCommand(sh,1));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
