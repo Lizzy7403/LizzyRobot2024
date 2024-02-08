@@ -7,6 +7,8 @@ public class ShootCommand extends Command {
     private final Shooter shooter;
     private final double speed;
 
+
+    //Constructor for the shootcommand class, requires a shooter and a speed as parameters
     public ShootCommand(Shooter shooter, double speed) {
         this.shooter = shooter;
         this.speed = speed;
@@ -17,6 +19,11 @@ public class ShootCommand extends Command {
     public void initialize() {
         shooter.setShooterSpeed(speed);
     }
+
+    public void end(boolean interrupted) {
+        shooter.stopShooter(); // Stop the shooter when the command ends
+    }
+
 
     @Override
     public boolean isFinished() {
