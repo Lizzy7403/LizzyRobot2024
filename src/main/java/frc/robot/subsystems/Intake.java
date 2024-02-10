@@ -48,6 +48,7 @@ public class Intake extends SubsystemBase {
   // The encoder for the rotation motor
   // This is used to get the position and velocity of the intake
   private final RelativeEncoder m_rotateEncoder;
+  private final RelativeEncoder m_rollEncoder;
 
   private final DigitalInput limitSwitch = new DigitalInput(4);
 
@@ -64,6 +65,8 @@ public class Intake extends SubsystemBase {
 
     // Getting the encoder from the rotation motor
     m_rotateEncoder = m_intakeMotorRotate.getEncoder();
+    m_rollEncoder = m_intakeMotorRoller.getEncoder();
+
 
     // Getting the PID controller from the rotation motor
     m_pidRotateController = m_intakeMotorRotate.getPIDController();
@@ -114,6 +117,11 @@ public class Intake extends SubsystemBase {
     return m_rotateEncoder.getPosition();
   }
 
+  public double getTotalSpin()
+  {
+    return m_intakeMotorRoller.getClosedLoopRampRate();
+  }
+
   // Method to reset the position of the intake
   // This is done by setting the position of the encoder to 0
   public void resetRotateEncoder() {
@@ -124,8 +132,11 @@ public class Intake extends SubsystemBase {
   // Currently, it does not perform any operations
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Intake Encoder position", m_rotateEncoder.getPosition());
-    SmartDashboard.putNumber("Intake Encoder velocity", m_rotateEncoder.getVelocity());
+    SmartDashboard.putNumber("Intake Encoder Rotate position", m_rotateEncoder.getPosition());
+    SmartDashboard.putNumber("Intake Encoder Rotate velocity", m_rotateEncoder.getVelocity());
+    SmartDashboard.putNumber("Intake Encoder Roller Postion", m_rollEncoder.getPosition());
+    SmartDashboard.putNumber("Intake Encoder Roller Speed", m_rollEncoder.getVelocity());
     SmartDashboard.putBoolean("Intake limitswitch", limitSwitch.get());
   }
+
 }

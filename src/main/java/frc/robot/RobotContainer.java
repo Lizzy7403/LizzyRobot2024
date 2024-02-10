@@ -76,7 +76,6 @@ public class RobotContainer {
     
     JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kR1.value);
     shootLow.whileTrue(new ShootCommand(shooter,Constants.ShooterConstants.kMaxAbsOutputRBLow));//Calls the shootCommand with a speed parameter that makes it shoot low
-
     
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

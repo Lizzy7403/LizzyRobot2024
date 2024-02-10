@@ -105,6 +105,7 @@ public class Telemetry {
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
             SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            // Registrar una array con las direcciones existentes del swerve
         }
     }
 }
