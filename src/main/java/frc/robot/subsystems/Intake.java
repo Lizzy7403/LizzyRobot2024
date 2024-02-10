@@ -77,9 +77,12 @@ public class Intake extends SubsystemBase {
     m_pidRotateController.setD(Constants.IntakeConstants.kD);
     m_pidRotateController.setIZone(Constants.IntakeConstants.kIz);
     m_pidRotateController.setFF(Constants.IntakeConstants.kFF);
-
     // Setting the output range for the PID controller
     m_pidRotateController.setOutputRange(-1. * Constants.IntakeConstants.kMaxAbsOutput, Constants.IntakeConstants.kMaxAbsOutput);
+  
+    
+  
+  
   }
 
   // Method to rotate the intake to a specific position
