@@ -19,16 +19,13 @@ public class Feed extends Command {
     private final double speed;
 
 
-    // The constructor for the SpinIntakeCommand class
-    // This is called when a SpinIntakeCommand object is created
+    // The constructor for the Feed class
+    // This is called when a Feed object is created
     // The Intake object and the speed passed as parameters are the subsystem and the speed that the command will operate on
     public Feed(Intake intake, double speed) {
         this.intake = intake;
         this.speed = speed;
     
-        // This command requires the intake subsystem
-        // This means that no other command that requires the intake subsystem can run at the same time as this command
-        //addRequirements(this.intake);
     }
 
   
