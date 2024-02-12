@@ -47,7 +47,9 @@ public class Intake extends SubsystemBase {
 
   // The encoder for the rotation motor
   // This is used to get the position and velocity of the intake
-  private final RelativeEncoder m_rotateEncoder;
+  private final RelativeEncoder  m_rotateEncoder;
+  
+
 
   private final DigitalInput limitSwitch = new DigitalInput(4);
 
@@ -77,9 +79,12 @@ public class Intake extends SubsystemBase {
     m_pidRotateController.setD(Constants.IntakeConstants.kD);
     m_pidRotateController.setIZone(Constants.IntakeConstants.kIz);
     m_pidRotateController.setFF(Constants.IntakeConstants.kFF);
-
     // Setting the output range for the PID controller
     m_pidRotateController.setOutputRange(-1. * Constants.IntakeConstants.kMaxAbsOutput, Constants.IntakeConstants.kMaxAbsOutput);
+  
+    
+  
+  
   }
 
   // Method to rotate the intake to a specific position
@@ -121,8 +126,9 @@ public class Intake extends SubsystemBase {
   // Currently, it does not perform any operations
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Intake Encoder position", m_rotateEncoder.getPosition());
-    SmartDashboard.putNumber("Intake Encoder velocity", m_rotateEncoder.getVelocity());
+    SmartDashboard.putNumber("Intake ENC POS", m_rotateEncoder.getPosition());
+    SmartDashboard.putNumber("Intake ENC SP", m_rotateEncoder.getVelocity());
     SmartDashboard.putBoolean("Intake limitswitch", limitSwitch.get());
+   
   }
 }
