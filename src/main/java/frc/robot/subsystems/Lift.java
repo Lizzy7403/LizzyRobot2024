@@ -2,9 +2,9 @@ package frc.robot.subsystems;
 
 import com.revrobotics.*;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 // Importing the SubsystemBase class from the WPILib library
 // This class provides the base for creating subsystems, which are major parts of the robot
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,10 +23,12 @@ public class Lift extends SubsystemBase {
 
   private final RelativeEncoder encoder;
   
-
+  private DoubleSolenoid m_doubleSolenoid;
 
   public Lift() {
     motor = new CANSparkMax(Constants.LiftConstants.MOTOR_ID, MotorType.kBrushless);
+
+    m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
 
     encoder = motor.getEncoder();
 
@@ -80,6 +82,13 @@ public class Lift extends SubsystemBase {
     pidRotateController.setFF(Constants.LiftConstants.kFFMoving);
   }
 
+  public void closeSolanoid() {
+    m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void openSolanoid() {
+    m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+  }
   
 
   @Override
