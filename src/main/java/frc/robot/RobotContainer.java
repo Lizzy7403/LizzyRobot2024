@@ -20,6 +20,7 @@ import frc.robot.commands.MoveLiftCommand;
 import frc.robot.commands.Collect;
 import frc.robot.commands.Feed;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.ToggleLift;
 import frc.robot.commands.RotateIntakeCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Shooter;
@@ -78,6 +79,9 @@ public class RobotContainer {
 
     JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kR1.value);
     shootLow.whileTrue(new ShootCommand(shooter,Constants.ShooterConstants.kMaxAbsOutputRBLow));//Calls the shootCommand with a speed parameter that makes it shoot low
+
+    JoystickButton toggleLift = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
+    toggleLift.onTrue(new ToggleLift(lift));
 
     
     JoystickButton collectNote = new JoystickButton(joystick , PS4Controller.Button.kShare.value);
