@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import frc.robot.commands.MoveLiftCommand;
 import frc.robot.commands.CollectCommand;
 import frc.robot.commands.FeedCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ToggleLiftCommand;
 import frc.robot.commands.RotateIntakeCommand;
+import frc.robot.commands.ShootCommand;
+import frc.robot.commands.ToggleIntakeCommand;
+import frc.robot.commands.ToggleLiftCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Lift;
@@ -30,6 +30,7 @@ import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
 
+  // The robot's subsystems and commands are defined here...
   private final Shooter shooter = new Shooter();
   private final Lift lift = new Lift();
   private final Intake intake =new Intake();
@@ -75,17 +76,19 @@ public class RobotContainer {
     //calls a  parallel command to start first the shooter and a few seconds later the feeder
     JoystickButton shootHigh = new JoystickButton(joystick,PS4Controller.Button.kR2.value); 
      //shootHigh.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new Feed(intake,0.2).withTimeout(1)),new RotateIntakeCommand(intake, Constants.IntakeConstants.kRotationSetpointHigh))));
-     shootHigh.whileTrue(new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh));
+     shootHigh.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new FeedCommand(intake, Constants.IntakeConstants.kMaxAbsOutputRBRetracted).withTimeout(1)),new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2))));
 
     JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kR1.value);
-    shootLow.whileTrue(new ShootCommand(shooter,Constants.ShooterConstants.kMaxAbsOutputRBLow));//Calls the shootCommand with a speed parameter that makes it shoot low
+    shootLow.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new FeedCommand(intake, Constants.IntakeConstants.kMaxAbsOutputRBRetracted).withTimeout(1)),new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBLow).withTimeout(2))));
 
     JoystickButton toggleLift = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
     toggleLift.onTrue(new ToggleLiftCommand(lift));
-
     
-    JoystickButton collectNote = new JoystickButton(joystick , PS4Controller.Button.kShare.value);
-    collectNote.whileTrue(new CollectCommand(intake, Constants.IntakeConstants.collectSpeed));
+    JoystickButton spinIntake = new JoystickButton(joystick, PS4Controller.Button.kCross.value);
+    spinIntake.whileTrue(new CollectCommand(intake, Constants.IntakeConstants.kMaxAbsOutputRBExtended, Constants.IntakeConstants.kMaxAbsOutputRBRetracted));
+
+    JoystickButton moveIntake = new JoystickButton(joystick, PS4Controller.Button.kL1.value);
+    moveIntake.onTrue(new ToggleIntakeCommand(intake, Constants.IntakeConstants.kRotationSetpointHigh, Constants.IntakeConstants.kRotationSetpointLow));
     
 
     if (Utils.isSimulation()) {

@@ -17,9 +17,6 @@ public final class Constants {
         public static final double kRotationSetpointHigh = 300;
         public static final double kRotationSetpointLow = 0;
 
-        //max output of the feeder
-        public static final double kMaxFeedOutput = 0.3;
-
         //max output at intake class
         public static final double kMaxAbsOutput = 0.5;
 
