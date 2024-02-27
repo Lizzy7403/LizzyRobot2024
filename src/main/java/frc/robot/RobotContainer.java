@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.MoveLiftCommand;
-import frc.robot.commands.Collect;
-import frc.robot.commands.Feed;
+import frc.robot.commands.CollectCommand;
+import frc.robot.commands.FeedCommand;
 import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ToggleLift;
+import frc.robot.commands.ToggleLiftCommand;
 import frc.robot.commands.RotateIntakeCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Shooter;
@@ -81,11 +81,11 @@ public class RobotContainer {
     shootLow.whileTrue(new ShootCommand(shooter,Constants.ShooterConstants.kMaxAbsOutputRBLow));//Calls the shootCommand with a speed parameter that makes it shoot low
 
     JoystickButton toggleLift = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
-    toggleLift.onTrue(new ToggleLift(lift));
+    toggleLift.onTrue(new ToggleLiftCommand(lift));
 
     
     JoystickButton collectNote = new JoystickButton(joystick , PS4Controller.Button.kShare.value);
-    collectNote.whileTrue(new Collect(intake, Constants.IntakeConstants.collectSpeed));
+    collectNote.whileTrue(new CollectCommand(intake, Constants.IntakeConstants.collectSpeed));
     
 
     if (Utils.isSimulation()) {

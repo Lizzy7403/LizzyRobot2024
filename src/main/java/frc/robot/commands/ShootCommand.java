@@ -21,7 +21,6 @@ public class ShootCommand extends Command {
     }
 
     public void end(boolean interrupted) {
-
        shooter.stopShooter(); // Stop the intake roller when the command ends
     }
 

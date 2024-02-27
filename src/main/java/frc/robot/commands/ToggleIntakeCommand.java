@@ -9,7 +9,6 @@ import frc.robot.subsystems.Intake;
 
 // Importing the BooleanSupplier and Runnable interfaces from the Java standard library
 // These interfaces represent a supplier of boolean values and a block of code to run, respectively
-import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -22,21 +21,13 @@ public class ToggleIntakeCommand extends Command {
     private final double setpointExtended;
     private final double setpointRetracted;
 
-    // A supplier of boolean values that indicates whether the intake is extended
-    private final BooleanSupplier isIntakeExtended;
-
-    // A block of code to run that toggles the extension of the intake
-    private final Runnable toggleIntakeExtension;
-
     // The constructor for the ToggleIntakeCommand class
     // This is called when a ToggleIntakeCommand object is created
     // The parameters are the subsystem, the setpoints, the supplier, and the block of code that the command will operate on
-    public ToggleIntakeCommand(Intake intake, double setpointExtended, double setpointRetracted, BooleanSupplier isIntakeExtended, Runnable toggleIntakeExtension) {
+    public ToggleIntakeCommand(Intake intake, double setpointExtended, double setpointRetracted) {
         this.intake = intake;
         this.setpointExtended = setpointExtended;
         this.setpointRetracted = setpointRetracted;
-        this.isIntakeExtended = isIntakeExtended;
-        this.toggleIntakeExtension = toggleIntakeExtension;
 
         // This command requires the intake subsystem
         // This means that no other command that requires the intake subsystem can run at the same time as this command
@@ -50,12 +41,12 @@ public class ToggleIntakeCommand extends Command {
     // Then it runs the block of code that toggles the extension of the intake
     @Override
     public void initialize() {
-        if (isIntakeExtended.getAsBoolean()) {
+        if (Intake.isExtended()) {
             new RotateIntakeCommand(intake, setpointRetracted, true).schedule();
         } else {
             new RotateIntakeCommand(intake, setpointExtended, false).schedule();
         }
-        toggleIntakeExtension.run();
+        Intake.setExtended(!Intake.isExtended());
     }
 
     // The isFinished method is called to determine when the command is finished

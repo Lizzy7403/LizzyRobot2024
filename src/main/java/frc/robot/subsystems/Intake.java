@@ -48,8 +48,8 @@ public class Intake extends SubsystemBase {
   // The encoder for the rotation motor
   // This is used to get the position and velocity of the intake
   private final RelativeEncoder  m_rotateEncoder;
-  
 
+  private static boolean isExtended = false;
 
   private final DigitalInput limitSwitch = new DigitalInput(4);
 
@@ -102,6 +102,14 @@ public class Intake extends SubsystemBase {
   public void stopRotateIntake() {
     m_pidRotateController.setReference(0, ControlType.kVelocity);
 
+  }
+
+  public static boolean isExtended(){
+    return isExtended;
+  }
+  
+  public static void setExtended(boolean extended){
+    isExtended = extended;
   }
 
   // Method to spin the intake at a specific speed

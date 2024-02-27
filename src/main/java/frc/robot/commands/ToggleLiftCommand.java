@@ -1,14 +1,13 @@
 package frc.robot.commands;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Lift;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ToggleLift extends Command {
+public class ToggleLiftCommand extends Command {
 
     private static boolean isExtended = false;
 
-    public ToggleLift (Lift lift){
+    public ToggleLiftCommand (Lift lift){
         
         if (isExtended)
         { 
@@ -20,7 +19,7 @@ public class ToggleLift extends Command {
             lift.openSolanoid();
             isExtended = true;
         }
-    }
+    } 
 
     public void robotPeriodic(){
         SmartDashboard.putBoolean("Solenoid Value ",isExtended);
