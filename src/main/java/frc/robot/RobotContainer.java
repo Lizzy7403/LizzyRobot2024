@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.CollectCommand;
 import frc.robot.commands.FeedCommand;
-import frc.robot.commands.RotateIntakeCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ToggleIntakeCommand;
 import frc.robot.commands.ToggleLiftCommand;
