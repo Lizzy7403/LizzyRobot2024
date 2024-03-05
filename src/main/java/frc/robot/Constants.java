@@ -14,6 +14,12 @@ public final class Constants {
         public static final double kIz = 30.0;
         public static final double kFF = 0.0;
 
+        public static final double kP2 = 0.01;
+        public static final double kI2 = 0.0000003;
+        public static final double kD2 = 0.0000018;
+        public static final double kIz2 = 30.0;
+        public static final double kFF2 = 0.0;
+
         public static final double kRotationSetpointHigh = 300;
         public static final double kRotationSetpointLow = 0;
 

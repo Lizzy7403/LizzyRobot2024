@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import frc.robot.Constants;
+
 // Importing the CommandBase class from the WPILib library
 // This class provides the base for creating commands, which are actions that the robot can perform
 
@@ -42,9 +44,9 @@ public class ToggleIntakeCommand extends Command {
     @Override
     public void initialize() {
         if (Intake.isExtended()) {
-            new RotateIntakeCommand(intake, setpointRetracted, true).schedule();
+            new RotateIntakeCommand(intake, setpointRetracted, true, Constants.IntakeConstants.kP, Constants.IntakeConstants.kI, Constants.IntakeConstants.kD, Constants.IntakeConstants.kIz, Constants.IntakeConstants.kFF).schedule();
         } else {
-            new RotateIntakeCommand(intake, setpointExtended, false).schedule();
+            new RotateIntakeCommand(intake, setpointExtended, false, Constants.IntakeConstants.kP2, Constants.IntakeConstants.kI2, Constants.IntakeConstants.kD2, Constants.IntakeConstants.kIz2, Constants.IntakeConstants.kFF2).schedule();
         }
         Intake.setExtended(!Intake.isExtended());
     }

@@ -75,7 +75,7 @@ public class RobotContainer {
     //calls a  parallel command to start first the shooter and a few seconds later the feeder
     JoystickButton shootHigh = new JoystickButton(joystick,PS4Controller.Button.kR2.value); 
      //shootHigh.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new Feed(intake,0.2).withTimeout(1)),new RotateIntakeCommand(intake, Constants.IntakeConstants.kRotationSetpointHigh))));
-     shootHigh.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new FeedCommand(intake, Constants.IntakeConstants.kMaxAbsOutputRBRetracted).withTimeout(1)),new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2))));
+    shootHigh.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new FeedCommand(intake, Constants.IntakeConstants.kMaxAbsOutputRBRetracted).withTimeout(1)),new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2))));
 
     JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kR1.value);
     shootLow.onTrue((Commands.parallel(Commands.waitSeconds(1).asProxy().andThen(new FeedCommand(intake, Constants.IntakeConstants.kMaxAbsOutputRBRetracted).withTimeout(1)),new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBLow).withTimeout(2))));

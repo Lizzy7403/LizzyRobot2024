@@ -93,6 +93,15 @@ public class Intake extends SubsystemBase {
     m_pidRotateController.setReference(setpoint, ControlType.kPosition);
   }
 
+  public void rotateIntakeWithPID(double setpoint, double kP, double kI, double kD, double kIz, double kFF) {
+    m_pidRotateController.setP(kP);
+    m_pidRotateController.setI(kI);
+    m_pidRotateController.setD(kD);
+    m_pidRotateController.setIZone(kIz);
+    m_pidRotateController.setFF(kFF);
+    m_pidRotateController.setReference(setpoint, ControlType.kPosition);
+  }
+
   public DigitalInput getLimitSwitch(){
     return limitSwitch;
   }

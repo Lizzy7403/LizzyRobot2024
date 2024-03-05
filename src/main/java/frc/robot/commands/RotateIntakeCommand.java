@@ -1,55 +1,39 @@
 package frc.robot.commands;
 
-// Importing the Command class from the WPILib library
-// This class provides the base for creating commands, which are actions that the robot can perform
 import edu.wpi.first.wpilibj2.command.Command;
-
-// Importing the Intake class from the robot's code
-// This class represents the intake subsystem of the robot
 import frc.robot.subsystems.Intake;
 
-// The RotateIntakeCommand class represents a command to rotate the intake
 public class RotateIntakeCommand extends Command {
 
-    // The intake subsystem that this command will operate on
     private final Intake intake;
-
-    // The desired position for the intake
-    // This is a double value representing the setpoint for the intake's rotation
     private final double setpoint;
+    private final boolean isExtended;
+    
+    // PID constants
+    private final double kP;
+    private final double kI;
+    private final double kD;
+    private final double kIz;
+    private final double kFF;
 
-    // A boolean flag to indicate when the command is finished
     private boolean isFinished = false;
 
-    private boolean isExtended = false;
-
-    // The constructor for the RotateIntakeCommand class
-    // This is called when a RotateIntakeCommand object is created
-    // The Intake object and the setpoint passed as parameters are the subsystem and the desired position that the command will operate on
-    public RotateIntakeCommand(Intake intake, double setpoint) {
-        this.intake = intake;
-        this.setpoint = setpoint;
-
-        // This command requires the intake subsystem
-        // This means that no other command that requires the intake subsystem can run at the same time as this command
-        addRequirements(this.intake);
-    }
-
-    public RotateIntakeCommand(Intake intake, double setpoint, boolean isExtended) {
+    public RotateIntakeCommand(Intake intake, double setpoint, boolean isExtended, double kP, double kI, double kD, double kIz, double kFF) {
         this.intake = intake;
         this.setpoint = setpoint;
         this.isExtended = isExtended;
-
-        // This command requires the intake subsystem
-        // This means that no other command that requires the intake subsystem can run at the same time as this command
-        //addRequirements(this.intake);
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.kIz = kIz;
+        this.kFF = kFF;
     }
 
     // The initialize method is called once when the command is started
     // For this command, the intake starts rotating to the specified setpoint when the command is started
     @Override
     public void initialize() {
-        intake.rotateIntake(setpoint);
+        intake.rotateIntakeWithPID(setpoint, kP, kI, kD, kIz, kFF);
     }
 
     // The execute method is called repeatedly until the command ends
