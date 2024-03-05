@@ -106,6 +106,13 @@ public class Intake extends SubsystemBase {
     return limitSwitch;
   }
 
+  public void feed(double speed){
+    //ramp
+    m_intakeMotorRoller.setOpenLoopRampRate(0);
+    m_intakeMotorRoller.set(speed);
+  }
+
+
   // Method to stop rotating the intake
   // This is done by setting the desired position of the intake to 0
   public void stopRotateIntake() {
