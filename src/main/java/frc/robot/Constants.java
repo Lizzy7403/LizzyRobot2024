@@ -8,11 +8,17 @@ public final class Constants {
         public static final int ROTATE_MOTOR_ID = 14;
         public static final int SPIN_MOTOR_ID = 16;
 
-        public static final double kP = 0.01;
-        public static final double kI = 0.0000003;
-        public static final double kD = 0.0000018;
+        public static final double kP = 0.01;//0.01;
+        public static final double kI = 0.0000003;//0.0000003;
+        public static final double kD = 0.0000018;//0.0000018;
         public static final double kIz = 30.0;
         public static final double kFF = 0.0;
+
+        public static final double kP2 = 0.02;//0.05;
+        public static final double kI2 = 0.0000003;//0.0000003;
+        public static final double kD2 = 0.0000018;//0.0000018;
+        public static final double kIz2 = 30.0;
+        public static final double kFF2 = 0.0;
 
         public static final double kRotationSetpointHigh = 300;
         public static final double kRotationSetpointLow = 0;
@@ -21,25 +27,26 @@ public final class Constants {
         public static final double kMaxFeedOutput = 0.3;
 
         //max output at intake class
-        public static final double kMaxAbsOutput = 0.5;
+        public static final double kMaxAbsOutput = 0.75;
 
         //max output at robot container class
-        public static final double kMaxAbsOutputRBExtended = 0.1;
-        public static final double kMaxAbsOutputRBRetracted = 0.5;
-        public static double collectSpeed=0.1;
+        public static final double kMaxAbsOutputRBExtended = 0.7;
+        public static final double kMaxAbsOutputRBRetracted = 0.2;
+        public static double collectSpeed=.7;
+        public static double releaseSpeed = 1;
     }
 
     public static final class ShooterConstants 
      {
 
-        public static final int MOTOR_1_ID = 19;  //MAKE SURE TO SWAP THE ID AGAIN
-        public static final int MOTOR_2_ID = 18;
+        public static final int MOTOR_1_ID = 18;  //MAKE SURE TO SWAP THE ID AGAIN
+        public static final int MOTOR_2_ID = 19;
         //max output at shooter class
         public static final double kMaxAbsOutput = 1;
         //max output at robot container class for high shot
-        public static final double kMaxAbsOutputRBHigh = .3;
+        public static final double kMaxAbsOutputRBHigh = -0.5;
         //max output at robot container class for low shot
-        public static final double kMaxAbsOutputRBLow = .15;
+        public static final double kMaxAbsOutputRBLow = -0.2;
     }
 
     public static final class LiftConstants 
@@ -75,6 +82,8 @@ public final class Constants {
         public static final boolean REVERSE_ENCODER = false;
 
         public static final int TIMEOUT_MS = 30;
+
+        public static final double speed = 1;
         
     }
 

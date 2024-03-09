@@ -16,6 +16,7 @@ public class MoveLiftCommand extends Command {
         addRequirements(lift);    
     }
 
+   
      // The initialize method is called once when the command is started
     // For this command, the intake starts spinning at the specified speed when the command is started
     @Override

@@ -20,6 +20,14 @@ public class ShootCommand extends Command {
         shooter.setShooterSpeed(speed);
     }
 
+          // The execute method is called repeatedly until the command ends
+    // For this command, it checks if the intake has reached the setpoint
+    // If the intake's position is within 5 units of the setpoint, the command is marked as finished
+    @Override
+
+   
+
+
     public void end(boolean interrupted) {
 
        shooter.stopShooter(); // Stop the intake roller when the command ends

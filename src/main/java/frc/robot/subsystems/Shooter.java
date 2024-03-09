@@ -43,12 +43,18 @@ public class Shooter extends SubsystemBase {
   public void setShooterSpeed(double speed) {
     // If the absolute value of the speed is greater than the maximum allowed,
     // set the speed to the maximum in the same direction
-    if(Math.abs(speed) > Constants.ShooterConstants.kMaxAbsOutput) {
+   if(Math.abs(speed) > Constants.ShooterConstants.kMaxAbsOutput) {
       speed = Math.signum(speed) * Constants.ShooterConstants.kMaxAbsOutput;
+      
     }
 
     // Set the speed of the first shooter motor and second shooter motor to the specified speed
+    
     shooterMotor1.set(speed);
+    
+    //shooterMotor1.setOpenLoopRampRate(.5);
+    //shooterMotor2.setOpenLoopRampRate(.5);
+
   }
 
   // Method to stop the shooter motors
