@@ -37,6 +37,8 @@ public class Intake extends SubsystemBase {
   // This is a Spark MAX motor controller controlling a brushless motor
   private CANSparkMax m_intakeMotorRotate;
 
+  private static boolean isExtended = false;
+
   // The motor that rolls the intake tape
   // This is also a Spark MAX motor controller controlling a brushless motor
   private CANSparkMax m_intakeMotorRoller;
@@ -53,7 +55,12 @@ public class Intake extends SubsystemBase {
   
 
 
-  private final DigitalInput limitSwitch = new DigitalInput(4);
+  private final DigitalInput limitSwitch1 = new DigitalInput(0);
+  private final DigitalInput limitSwitch2 = new DigitalInput(1);
+  private final DigitalInput limitSwitch3 = new DigitalInput(2);
+
+
+
 
   // The constructor for the Intake class 
     // This is called when an Intake object is created
@@ -64,7 +71,7 @@ public class Intake extends SubsystemBase {
 
     // Initializing the roller motor with its ID and specifying that it's a brushless motor
     m_intakeMotorRoller = new CANSparkMax(Constants.IntakeConstants.SPIN_MOTOR_ID ,MotorType.kBrushed);
-    m_intakeMotorRoller.setOpenLoopRampRate(1);
+    m_intakeMotorRoller.setOpenLoopRampRate(0);
 
     // Getting the encoder from the rotation motor
     m_rotateEncoder = m_intakeMotorRotate.getEncoder();
@@ -103,6 +110,40 @@ public class Intake extends SubsystemBase {
   
   }
 
+  public static boolean isExtended() {
+      return isExtended;
+  }
+
+  public static void setIsExtended(boolean isExtended){
+    Intake.isExtended = isExtended;
+  }
+
+  public void setPID(double kP, double kI, double kD, double kIz, double kFF){
+    m_pidRotateControllerUp.setP(kP);
+    m_pidRotateControllerUp.setI(kI);
+    m_pidRotateControllerUp.setD(kD);
+    m_pidRotateControllerUp.setIZone(kIz);
+    m_pidRotateControllerUp.setFF(kFF);
+
+  }
+
+  public void resetPID(){
+    m_pidRotateControllerUp.setP(Constants.LiftConstants.kPMoving);
+    m_pidRotateControllerUp.setI(Constants.LiftConstants.kIMoving);
+    m_pidRotateControllerUp.setD(Constants.LiftConstants.kDMoving);
+    m_pidRotateControllerUp.setIZone(Constants.LiftConstants.kIzMoving);
+    m_pidRotateControllerUp.setFF(Constants.LiftConstants.kFFMoving);
+  }
+
+  public void rotateIntakeWithPID(double setpoint, double kP, double kI, double kD, double kIz, double kFF) {
+    m_pidRotateController.setP(kP);
+    m_pidRotateController.setI(kI);
+    m_pidRotateController.setD(kD);
+    m_pidRotateController.setIZone(kIz);
+    m_pidRotateController.setFF(kFF);
+    m_pidRotateController.setReference(setpoint, ControlType.kPosition);
+  }
+
   // Method to rotate the intake to a specific position
   // The setpoint parameter is the desired position of the intake
   public void rotateIntake(double setpoint) {
@@ -118,10 +159,31 @@ public class Intake extends SubsystemBase {
     m_intakeMotorRotate.set(speed);
   }
 
+  public void centerNote(double speed, int time)
+  {
+    m_intakeMotorRotate.set(speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+    m_intakeMotorRotate.set(-speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+    m_intakeMotorRotate.set(speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+    m_intakeMotorRotate.set(-speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+
+  }
+
   
 
-  public DigitalInput getLimitSwitch(){
-    return limitSwitch;
+  public boolean getLimitSwitch(){
+    
+
+    if(limitSwitch1.get() || limitSwitch2.get() || limitSwitch3.get()){
+      return true;
+    
+    }
+    else
+    return false;
+  
   }
 
   // Method to stop rotating the intake
@@ -137,8 +199,7 @@ public class Intake extends SubsystemBase {
     m_intakeMotorRoller.set(speed);
   }
   public void feed(double speed){
-    m_intakeMotorRoller.setOpenLoopRampRate(0);
-    //m_intakeMotorRoller.setClosedLoopRampRate(0.00000000000001);
+    
     m_intakeMotorRoller.set(speed);
 
   }
@@ -161,7 +222,7 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Intake ENC POS", m_rotateEncoder.getPosition());
     //SmartDashboard.putNumber("Intake ENC SP", m_rotateEncoder.getVelocity());
-    SmartDashboard.putBoolean("Intake limitswitch", limitSwitch.get());
+    SmartDashboard.putBoolean("Intake limitswitch", getLimitSwitch());
     
   }
 }

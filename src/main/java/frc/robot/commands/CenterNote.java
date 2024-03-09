@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 // The SpinIntakeCommand class represents a command to spin the intake
-public class Collect extends Command {
+public class CenterNote extends Command {
 
     // The intake subsystem that this command will operate on
     private final Intake intake;
@@ -16,14 +16,16 @@ public class Collect extends Command {
     // The speed at which the intake should spin
     // This is a double value between -1.0 and 1.0
     private final double speed;
+    private final double time;
 
 
     // The constructor for the SpinIntakeCommand class
     // This is called when a SpinIntakeCommand object is created
     // The Intake object and the speed passed as parameters are the subsystem and the speed that the command will operate on
-    public Collect(Intake intake, double speed) {
+    public CenterNote(Intake intake, double speed, double time) {
         this.intake = intake;
         this.speed = speed;
+        this.time = time;
     
         // This command requires the intake subsystem
         // This means that no other command that requires the intake subsystem can run at the same time as this command

@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import frc.robot.Constants;
+
 // Importing the CommandBase class from the WPILib library
 // This class provides the base for creating commands, which are actions that the robot can perform
 
@@ -9,7 +11,6 @@ import frc.robot.subsystems.Intake;
 
 // Importing the BooleanSupplier and Runnable interfaces from the Java standard library
 // These interfaces represent a supplier of boolean values and a block of code to run, respectively
-import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -22,21 +23,13 @@ public class ToggleIntakeCommand extends Command {
     private final double setpointExtended;
     private final double setpointRetracted;
 
-    // A supplier of boolean values that indicates whether the intake is extended
-    private final BooleanSupplier isIntakeExtended;
-
-    // A block of code to run that toggles the extension of the intake
-    private final Runnable toggleIntakeExtension;
-
     // The constructor for the ToggleIntakeCommand class
     // This is called when a ToggleIntakeCommand object is created
     // The parameters are the subsystem, the setpoints, the supplier, and the block of code that the command will operate on
-    public ToggleIntakeCommand(Intake intake, double setpointExtended, double setpointRetracted, BooleanSupplier isIntakeExtended, Runnable toggleIntakeExtension) {
+    public ToggleIntakeCommand(Intake intake, double setpointExtended, double setpointRetracted) {
         this.intake = intake;
         this.setpointExtended = setpointExtended;
         this.setpointRetracted = setpointRetracted;
-        this.isIntakeExtended = isIntakeExtended;
-        this.toggleIntakeExtension = toggleIntakeExtension;
 
         // This command requires the intake subsystem
         // This means that no other command that requires the intake subsystem can run at the same time as this command
@@ -50,13 +43,17 @@ public class ToggleIntakeCommand extends Command {
     // Then it runs the block of code that toggles the extension of the intake
     @Override
     public void initialize() {
-        if (isIntakeExtended.getAsBoolean()) {
-            new RotateIntakeCommand(intake, setpointRetracted, true).schedule();
+        if (Intake.isExtended()) {
+            new RotateIntakeCommandWithPID(intake, setpointRetracted, true, Constants.IntakeConstants.kP, Constants.IntakeConstants.kI, Constants.IntakeConstants.kD, Constants.IntakeConstants.kIz, Constants.IntakeConstants.kFF).schedule();
         } else {
-            new RotateIntakeCommand(intake, setpointExtended, false).schedule();
+            new RotateIntakeCommandWithPID(intake, setpointExtended, false, Constants.IntakeConstants.kP2, Constants.IntakeConstants.kI2, Constants.IntakeConstants.kD2, Constants.IntakeConstants.kIz2, Constants.IntakeConstants.kFF2).schedule();
         }
-        toggleIntakeExtension.run();
     }
+
+    @Override
+  public void end(boolean interrupted) {
+    Intake.setIsExtended(Intake.isExtended());
+  }
 
     // The isFinished method is called to determine when the command is finished
     // For this command, it is finished immediately after the intake's extension is toggled

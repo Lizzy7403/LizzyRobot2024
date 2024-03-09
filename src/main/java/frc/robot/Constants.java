@@ -32,7 +32,7 @@ public final class Constants {
         //max output at robot container class
         public static final double kMaxAbsOutputRBExtended = 0.7;
         public static final double kMaxAbsOutputRBRetracted = 0.2;
-        public static double collectSpeed=.7;
+        public static double collectSpeed=1;
         public static double releaseSpeed = 1;
     }
 
@@ -55,9 +55,9 @@ public final class Constants {
         //max output at shooter class
         public static final double kMaxAbsOutput = 0.3;
         //max output at robot container class for going up
-        public static final double kMaxAbsOutputRBUp = 0.3;
+        public static final double kMaxAbsOutputRBUp = 1;
         //max output at robot container class for going down
-        public static final double kMaxAbsOutputRBDown = -0.3;
+        public static final double kMaxAbsOutputRBDown = -1;
 
         public static final int peakCurrentLimit = 30; // the peak current, in amps
 
@@ -84,6 +84,10 @@ public final class Constants {
         public static final int TIMEOUT_MS = 30;
 
         public static final double speed = 1;
+
+        public static final double kShootPos = -190;
+        public static final double kUnderChainPos = 0;
+
         
     }
 

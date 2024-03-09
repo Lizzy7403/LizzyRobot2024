@@ -13,12 +13,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // Importing the Constants class from the robot's code
 // This class contains constant values used throughout the robot's code
 //import frc.robot.Constants;
+import com.revrobotics.CANSparkMax;
+
+// Importing the RelativeEncoder class from the REV Robotics library
+// This class provides methods to get the position and velocity of the encoder
+import com.revrobotics.RelativeEncoder;
+
+// Importing the SparkMaxPIDController class from the REV Robotics library
+// This class provides methods to control a motor using PID
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+
 import frc.robot.*;
 
 public class Lift extends SubsystemBase {
 
+  private static boolean isSolenoidUp = false;
 
-  private final CANSparkMax motor;
+  private final CANSparkMax liftMotor;
 
   private SparkPIDController pidLiftController;
 
@@ -27,16 +39,16 @@ public class Lift extends SubsystemBase {
   private DoubleSolenoid m_doubleSolenoid;
 
   public Lift() {
-    motor = new CANSparkMax(Constants.LiftConstants.MOTOR_ID, MotorType.kBrushless);
-    motor.setOpenLoopRampRate(1);
+    liftMotor = new CANSparkMax(Constants.LiftConstants.MOTOR_ID, MotorType.kBrushless);
+    liftMotor.setOpenLoopRampRate(0.5);
     
     
 
     m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
 
-    liftEncoder = motor.getEncoder();
+    liftEncoder = liftMotor.getEncoder();
 
-    pidLiftController = motor.getPIDController();
+    pidLiftController = liftMotor.getPIDController();
 
     pidLiftController.setFeedbackDevice(liftEncoder);
   
@@ -46,28 +58,40 @@ public class Lift extends SubsystemBase {
     pidLiftController.setIZone(Constants.LiftConstants.kIzMoving);
     pidLiftController.setFF(Constants.LiftConstants.kFFMoving);
 
-    motor.setClosedLoopRampRate(1);
+    liftMotor.setClosedLoopRampRate(1);
 
     //output range
     pidLiftController.setOutputRange( -1 * Constants.LiftConstants.kMaxAbsOutput, Constants.LiftConstants.kMaxAbsOutput);
   }
 
+  public boolean isSolenoidUp() {
+      return isSolenoidUp;
+  }
+
+  public void setIsSolenoidUp(boolean isSolenoidUp){
+    Lift.isSolenoidUp = isSolenoidUp;
+  }
+
   public void setPosition(double position) {
-    pidLiftController.setReference(position, CANSparkBase.ControlType.kPosition);
+    pidLiftController.setReference(position, ControlType.kPosition);
   }
 
   public void moveLift(double speed){
 
-    motor.set(speed);
+    liftMotor.set(speed);
   }
 
+  public double getLiftEncoderPostion(){
+
+    return liftEncoder.getPosition();
+  }
 
   public void resetLiftEncoder() {
     liftEncoder.setPosition(0);
   }
 
   public void stopLift() {
-    motor.set(0);
+    liftMotor.set(0);
   }
 
   public void lockPosition(double kP, double kI, double kD, double kIz, double kFF) {
@@ -92,11 +116,11 @@ public class Lift extends SubsystemBase {
     pidLiftController.setFF(Constants.LiftConstants.kFFMoving);
   }
 
-  public void closeSolanoid() {
+  public void closeSolenoid() {
     m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
   }
 
-  public void openSolanoid() {
+  public void openSolenoid() {
     m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
   }
   
@@ -104,8 +128,9 @@ public class Lift extends SubsystemBase {
   @Override
   public void periodic() {
 
-   // SmartDashboard.putNumber("LIFT ENCODER", liftEncoder.getPosition());
-    //SmartDashboard.putNumber("Intake ENC SP", m_rotateEncoder.getVelocity());
+   SmartDashboard.putNumber("LIFT ENCODER", liftEncoder.getPosition());
+  
+    
 
   }
 }
