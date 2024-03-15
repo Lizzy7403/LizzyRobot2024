@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 // The RotateIntakeCommand class represents a command to rotate the intake
-public class RotateIntakeCommand extends Command {
+public class RotateIntakeUpCommand extends Command {
 
     // The intake subsystem that this command will operate on
     private final Intake intake;
@@ -26,7 +26,7 @@ public class RotateIntakeCommand extends Command {
     // The constructor for the RotateIntakeCommand class
     // This is called when a RotateIntakeCommand object is created
     // The Intake object and the setpoint passed as parameters are the subsystem and the desired position that the command will operate on
-    public RotateIntakeCommand(Intake intake, double setpoint) {
+    public RotateIntakeUpCommand(Intake intake, double setpoint) {
         this.intake = intake;
         this.setpoint = setpoint;
 
@@ -36,7 +36,7 @@ public class RotateIntakeCommand extends Command {
     }
 
 
-    public RotateIntakeCommand(Intake intake, double setpoint, boolean isExtended) {
+    public RotateIntakeUpCommand(Intake intake, double setpoint, boolean isExtended) {
         this.intake = intake;
         this.setpoint = setpoint;
         this.isExtended = isExtended;
@@ -45,7 +45,7 @@ public class RotateIntakeCommand extends Command {
         // This means that no other command that requires the intake subsystem can run at the same time as this command
         //addRequirements(this.intake);
     }
-     public RotateIntakeCommand(Intake intake, double setpoint, double speed) {
+     public RotateIntakeUpCommand(Intake intake, double setpoint, double speed) {
         this.intake = intake;
         this.setpoint = setpoint;
       
@@ -59,7 +59,7 @@ public class RotateIntakeCommand extends Command {
     // For this command, the intake starts rotating to the specified setpoint when the command is started
     @Override
     public void initialize() {
-        intake.rotateIntake(setpoint); 
+        intake.rotateIntakeUp(setpoint);
     }
 
     // The execute method is called repeatedly until the command ends

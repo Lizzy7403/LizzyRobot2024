@@ -37,6 +37,8 @@ public class Intake extends SubsystemBase {
   // This is a Spark MAX motor controller controlling a brushless motor
   private CANSparkMax m_intakeMotorRotate;
 
+  private static boolean isExtended = false;
+
   // The motor that rolls the intake tape
   // This is also a Spark MAX motor controller controlling a brushless motor
   private CANSparkMax m_intakeMotorRoller;
@@ -44,6 +46,8 @@ public class Intake extends SubsystemBase {
   // The PID controller for the rotation motor
   // This is used to control the position of the intake
   private SparkPIDController m_pidRotateController;
+  private SparkPIDController m_pidRotateControllerUp;
+
 
   // The encoder for the rotation motor
   // This is used to get the position and velocity of the intake
@@ -51,7 +55,12 @@ public class Intake extends SubsystemBase {
   
 
 
-  private final DigitalInput limitSwitch = new DigitalInput(4);
+  private final DigitalInput limitSwitch1 = new DigitalInput(0);
+  private final DigitalInput limitSwitch2 = new DigitalInput(1);
+  private final DigitalInput limitSwitch3 = new DigitalInput(2);
+
+
+
 
   // The constructor for the Intake class 
     // This is called when an Intake object is created
@@ -61,8 +70,8 @@ public class Intake extends SubsystemBase {
     m_intakeMotorRotate = new CANSparkMax(Constants.IntakeConstants.ROTATE_MOTOR_ID ,MotorType.kBrushless);
 
     // Initializing the roller motor with its ID and specifying that it's a brushless motor
-    m_intakeMotorRoller = new CANSparkMax(Constants.IntakeConstants.SPIN_MOTOR_ID ,MotorType.kBrushless);
-    m_intakeMotorRoller.setClosedLoopRampRate(1);
+    m_intakeMotorRoller = new CANSparkMax(Constants.IntakeConstants.SPIN_MOTOR_ID ,MotorType.kBrushed);
+    m_intakeMotorRoller.setOpenLoopRampRate(0);
 
     // Getting the encoder from the rotation motor
     m_rotateEncoder = m_intakeMotorRotate.getEncoder();
@@ -80,11 +89,59 @@ public class Intake extends SubsystemBase {
     m_pidRotateController.setIZone(Constants.IntakeConstants.kIz);
     m_pidRotateController.setFF(Constants.IntakeConstants.kFF);
     // Setting the output range for the PID controller
-    m_pidRotateController.setOutputRange(-1. * Constants.IntakeConstants.kMaxAbsOutput, Constants.IntakeConstants.kMaxAbsOutput);
+    m_pidRotateController.setOutputRange(-1. * Constants.IntakeConstants.kMaxAbsOutputRBExtended, Constants.IntakeConstants.kMaxAbsOutputRBRetracted);
+
+    
+    m_pidRotateControllerUp = m_intakeMotorRotate.getPIDController();
+
+    // Setting the encoder as the feedback device for the PID controller
+    m_pidRotateControllerUp.setFeedbackDevice(m_rotateEncoder);
+
+    m_pidRotateControllerUp.setP(Constants.IntakeConstants.kP2);
+    m_pidRotateControllerUp.setI(Constants.IntakeConstants.kI2);
+    m_pidRotateControllerUp.setD(Constants.IntakeConstants.kD2);
+    m_pidRotateControllerUp.setIZone(Constants.IntakeConstants.kIz2);
+    m_pidRotateControllerUp.setFF(Constants.IntakeConstants.kFF2);
+    // Setting the output range for the PID controller
+    m_pidRotateControllerUp.setOutputRange(-1. * Constants.IntakeConstants.kMaxAbsOutputRBExtended, Constants.IntakeConstants.kMaxAbsOutputRBRetracted);
   
     
   
   
+  }
+
+  public static boolean isExtended() {
+      return isExtended;
+  }
+
+  public static void setIsExtended(boolean isExtended){
+    Intake.isExtended = isExtended;
+  }
+
+  public void setPID(double kP, double kI, double kD, double kIz, double kFF){
+    m_pidRotateControllerUp.setP(kP);
+    m_pidRotateControllerUp.setI(kI);
+    m_pidRotateControllerUp.setD(kD);
+    m_pidRotateControllerUp.setIZone(kIz);
+    m_pidRotateControllerUp.setFF(kFF);
+
+  }
+
+  public void resetPID(){
+    m_pidRotateControllerUp.setP(Constants.LiftConstants.kPMoving);
+    m_pidRotateControllerUp.setI(Constants.LiftConstants.kIMoving);
+    m_pidRotateControllerUp.setD(Constants.LiftConstants.kDMoving);
+    m_pidRotateControllerUp.setIZone(Constants.LiftConstants.kIzMoving);
+    m_pidRotateControllerUp.setFF(Constants.LiftConstants.kFFMoving);
+  }
+
+  public void rotateIntakeWithPID(double setpoint, double kP, double kI, double kD, double kIz, double kFF) {
+    m_pidRotateController.setP(kP);
+    m_pidRotateController.setI(kI);
+    m_pidRotateController.setD(kD);
+    m_pidRotateController.setIZone(kIz);
+    m_pidRotateController.setFF(kFF);
+    m_pidRotateController.setReference(setpoint, ControlType.kPosition);
   }
 
   // Method to rotate the intake to a specific position
@@ -93,8 +150,41 @@ public class Intake extends SubsystemBase {
     m_pidRotateController.setReference(setpoint, ControlType.kPosition);
   }
 
-  public DigitalInput getLimitSwitch(){
-    return limitSwitch;
+ public void rotateIntakeUp(double setpoint) {
+    m_pidRotateControllerUp.setReference(setpoint, ControlType.kPosition);
+}
+
+  public void rotateFree(double speed){
+
+    m_intakeMotorRotate.set(speed);
+  }
+
+  public void centerNote(double speed, int time)
+  {
+    m_intakeMotorRotate.set(speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+    m_intakeMotorRotate.set(-speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+    m_intakeMotorRotate.set(speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+    m_intakeMotorRotate.set(-speed);
+    m_intakeMotorRotate.setCANTimeout(time);
+
+  }
+
+  
+
+  public boolean getLimitSwitch(){
+    
+
+    if(limitSwitch2.get() || limitSwitch3.get()){
+      
+      return true;
+    
+    }
+    else
+    return false;
+  
   }
 
   // Method to stop rotating the intake
@@ -109,12 +199,19 @@ public class Intake extends SubsystemBase {
   public void spinIntake(double speed) {
     m_intakeMotorRoller.set(speed);
   }
+  public void feed(double speed){
+    
+    m_intakeMotorRoller.set(speed);
+
+  }
 
   // Method to get the current position of the intake
   // This is done by getting the position from the encoder
   public double getRotateEncoderPosition() {
     return m_rotateEncoder.getPosition();
   }
+
+
 
   // Method to reset the position of the intake
   // This is done by setting the position of the encoder to 0
@@ -127,8 +224,14 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Intake ENC POS", m_rotateEncoder.getPosition());
-    SmartDashboard.putNumber("Intake ENC SP", m_rotateEncoder.getVelocity());
-    SmartDashboard.putBoolean("Intake limitswitch", limitSwitch.get());
-   
+    //SmartDashboard.putNumber("Intake ENC SP", m_rotateEncoder.getVelocity());
+    SmartDashboard.putBoolean("Intake limitswitch", getLimitSwitch());
+    SmartDashboard.putBoolean("limitSwitch1", limitSwitch1.get());
+    SmartDashboard.putBoolean("limitSwitch2", limitSwitch2.get());
+    SmartDashboard.putBoolean("limitSwitch3", limitSwitch3.get());
+    SmartDashboard.putBoolean("isExtended", isExtended);
+
+
+    
   }
 }

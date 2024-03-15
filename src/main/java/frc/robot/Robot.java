@@ -7,15 +7,50 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.vision.*;
 
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobot{
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private Thread cameraThread;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    cameraThread = new Thread(
+            () -> {
+              // Get the camera from the server
+              //UsbCamera camera = CameraServer.startAutomaticCapture();
+
+              // Capture Mats from the camera
+              CvSink cvSink = CameraServer.getVideo();
+              // Setup a CvSource
+              CvSource outputStream = CameraServer.putVideo("Camera", 640, 480);
+              Mat mat = new Mat();
+
+              while (!Thread.interrupted()) {
+                if (cvSink.grabFrame(mat) == 0) {
+                  outputStream.notifyError(cvSink.getError());
+                  continue;
+                }
+                // Put a rectangle on the image
+                Imgproc.rectangle(
+                    mat, new Point(100, 100), new Point(400, 400), new Scalar(255, 255, 255), 5);
+                // Give the output stream a new image to display
+                outputStream.putFrame(mat);
+              }
+            });
+    cameraThread.setDaemon(true);
+    cameraThread.start();
   }
 
   @Override
@@ -42,7 +77,11 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+
+   // CommandScheduler.getInstance().run();
+
+  }
 
   @Override
   public void autonomousExit() {}
