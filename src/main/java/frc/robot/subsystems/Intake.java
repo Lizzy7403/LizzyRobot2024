@@ -177,7 +177,7 @@ public class Intake extends SubsystemBase {
   public boolean getLimitSwitch(){
     
 
-    if(limitSwitch1.get() || limitSwitch2.get() || limitSwitch3.get()){
+    if(limitSwitch2.get() || limitSwitch3.get()){
       
       return true;
     

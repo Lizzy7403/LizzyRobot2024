@@ -7,6 +7,18 @@ package frc.robot;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.util.Named;
+
+// PATH PLANNER LIBRARIES
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,26 +62,45 @@ public class RobotContainer {
   private double MaxAngularRate = Constants.Swerve.maxAngularRate * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.2) // Add a 10% deadband
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  ////////////////////////////////////////////// AUTO INSTANCE VARIABLES.
+  ////////////////////////////////////////////// AUTO CONFIGURATION ./////////////////////
 
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+   //private String m_autoSelected;
+   //private SendableChooser<Command> m_chooser = new SendableChooser<>();
 
-    private Command PathBlueLeft1 = drivetrain.getAutoPath("PathBlueLeft1");
-    private Command PathBlueLeft2 = drivetrain.getAutoPath("PathBlueLeft2");
+    private Command autopath1 = drivetrain.getAutoPath("autopath1");
+    private Command autopath2 = drivetrain.getAutoPath("autopath2");
+    private Command autopath3 = drivetrain.getAutoPath("autopath3");
+    //private Command autopath4 = drivetrain.getAutoPath("autopath4");
+    //private Command autopath5 = drivetrain.getAutoPath("autopath5");
+    //private Command autopath6 = drivetrain.getAutoPath("autopath6");
 
+    private Command shootSp = Commands.parallel(
+        Commands.waitSeconds(3).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
+        new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
+      ).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos));
 
- 
+    /*private Command blueAutoLeft = shootSp.andThen(new RotateIntakeCommand(intake, 55))
+    .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
+    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
+    .andThen(autopath2).andThen(shootSp).andThen(Commands.parallel(autopath3,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));*/
 
+    /*private Command blueAutoCenter = shootSp.andThen(new RotateIntakeCommand(intake, 55))
+    .andThen(Commands.parallel(autopath4,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
+    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
+    .andThen(autopath5).andThen(shootSp).andThen(Commands.parallel(autopath3,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));*/
+
+    /*private  Command blueAutoRight = shootSp.andThen(new RotateIntakeCommand(intake, 55))
+    .andThen(Commands.parallel(autopath4,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
+    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
+    .andThen(autopath5).andThen(shootSp)6.andThen(Commands.parallel(autopath3,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));*/
 
 
   private void configureBindings() 
@@ -83,9 +114,6 @@ public class RobotContainer {
         ));
 
 
-  //  JoystickButton brakeSwerve = new JoystickButton(joystick, PS4Controller.Button.kCircle.value);
-  //  brakeSwerve.whileTrue(drivetrain.applyRequest(() -> brake));
-
    JoystickButton pointToDirection = new JoystickButton(joystick, PS4Controller.Button.kPS.value);
    pointToDirection.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
@@ -97,38 +125,21 @@ public class RobotContainer {
 
    //calls a  parallel command to start first the shooter and a few seconds later the feeder
    JoystickButton shootHigh = new JoystickButton(joystick,PS4Controller.Button.kCircle.value); 
-    shootHigh.onTrue(
-    (Commands.parallel(
-      Commands.waitSeconds(3).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
-      new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
-      new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
-     )).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
-     // new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
-
-
-  // shootHigh.whileTrue(new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh));
-///////////////////////////////////////////////////////
+    shootHigh.onTrue( Commands.parallel(
+        Commands.waitSeconds(4).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
+        new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
+      ).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
+    
+ 
    
 JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kCross.value);
-    //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(0.13).asProxy().andThen(new Feed(intake,1).withTimeout(1)), new RotateIntakeCommand(intake,35,1)));
-
-    //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(1.6).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
-   // new RotateIntakeCommand(intake, 40 )));//Calls the shootCommand with a speed parameter that makes it shoot low
-
-   //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(2).asProxy().andThen(new Feed(intake,1).withTimeout(1)), new RotateIntakeCommand(intake,22)));
-   //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(0.13).asProxy().andThen(new Feed(intake,1).withTimeout(1)), new RotateIntakeCommand(intake,35,1)));
-/*shootLow.onTrue(new MoveLiftCommand(lift, -420)
-.andThen(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(0.7),new Feed(intake, 0.8).withTimeout(2))
-.andThen(new MoveLiftCommand(lift, -480)).andThen(new SolenoidUp(lift).withTimeout(.9))
-.andThen(new SolenoidDown(lift).withTimeout(0.2))).andThen(new MoveLiftCommand(lift,0)));
-*/
-
-shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2),Commands.waitSeconds(0.5).andThen(new Feed(intake,1))));
+shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(1),Commands.waitSeconds(0.5).andThen(new Feed(intake,1))));
     
 //INTAKE BUTTON)
 
     JoystickButton collectNote = new JoystickButton(joystick , PS4Controller.Button.kR1.value);
-    collectNote.whileTrue(new Collect(intake, -Constants.IntakeConstants.collectSpeed));
+    collectNote.whileTrue(new Collect(intake, Constants.IntakeConstants.collectSpeed));
     
     JoystickButton releaseNote = new JoystickButton(joystick , PS4Controller.Button.kL1.value);
     releaseNote.whileTrue(new Feed(intake, Constants.IntakeConstants.releaseSpeed));
@@ -140,14 +151,7 @@ shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2),Commands.wa
 
 
     JoystickButton rotateOut = new JoystickButton(joystick , PS4Controller.Button.kR2.value);
-    //rotateInverse.whileTrue(new RotateFree(intake, -Constants.IntakeConstants.kMaxAbsOutputRBRetracted));
      rotateOut.onTrue(new RotateIntakeCommand(intake, 55));
-
-     //JoystickButton toggleIntake = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
-
-     //toggleIntake.onTrue(new ToggleIntakeCommand(intake, 48, 0));
-
-     
 
     // LIFT BUTTONS
 
@@ -156,13 +160,6 @@ shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2),Commands.wa
 
      JoystickButton moveLiftDown = new JoystickButton(joystick , PS4Controller.Button.kShare.value);
     moveLiftDown.whileTrue(new MoveLift(lift, -Constants.LiftConstants.speed));
-
-    //JoystickButton closeSoleButton = new JoystickButton(joystick, PS4Controller.Button.kL3.value);
-    
-    //closeSoleButton.onTrue(new SolenoidUp(lift));
-
-    //JoystickButton openSoleButton = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
-    //openSoleButton.onTrue(new SolenoidDown(lift));
 
     JoystickButton upSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value);
 
@@ -195,21 +192,19 @@ shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2),Commands.wa
     intake.resetRotateEncoder();
     lift.resetLiftEncoder();
     shooter.resetShooterEncoder();
-
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("Auto1", kCustomAuto);
-    m_chooser.addOption("Auto2", kCustomAuto);
-    m_chooser.addOption("Auto3", kCustomAuto);
-    m_chooser.addOption("Auto4", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
-  
-
+   
+    //AutoBuilder.buildAutoChooser();
+    //SmartDashboard.putData("Sendable Chooser", m_chooser);
+   
 
     configureBindings();
   }
 
   public Command getAutonomousCommand() { //Uses the program from Path planner to create an autonomous code
-    return Commands.print("No autonomous command configured");
-  }
+    
+    return shootSp.andThen(new RotateIntakeCommand(intake, 55))
+    .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
+    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
+    .andThen(autopath2).andThen(shootSp).andThen(autopath3); //m_chooser.getSelected();
+}
 }

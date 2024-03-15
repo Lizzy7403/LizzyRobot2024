@@ -60,8 +60,8 @@ public class Collect extends Command {
     // For this command, it is never finished on its own, it will run until it's explicitly interrupted
     @Override
     public boolean isFinished() {
-       return false;
-        // return intake.getLimitSwitch(); // This command will run until it's explicitly interrupted
+      
+         return intake.getLimitSwitch(); // This command will run until it's explicitly interrupted
     }
 
 }
