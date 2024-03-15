@@ -12,15 +12,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.MoveLiftCommand;
+import frc.robot.commands.RotateFree;
 import frc.robot.Constants.LiftConstants;
 import frc.robot.commands.Collect;
 import frc.robot.commands.Feed;
 import frc.robot.commands.MoveLift;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.ShootPID;
+import frc.robot.commands.SolenoidDown;
+import frc.robot.commands.SolenoidUp;
 import frc.robot.commands.ToggleIntakeCommand;
 import frc.robot.commands.ToggleSolenoid;
 import frc.robot.commands.RotateIntakeCommand;
@@ -36,8 +42,7 @@ public class RobotContainer {
   private final Lift lift = new Lift();
   private final Intake intake =new Intake();
 
-  
-   /* Setting up bindings for necessary control of the swerve drive platform */
+  /* Setting up bindings for necessary control of the swerve drive platform */
   private final PS4Controller joystick = new PS4Controller(Constants.PS4GamePad.joystickPort);
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
@@ -51,6 +56,21 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  ////////////////////////////////////////////// AUTO INSTANCE VARIABLES.
+
+  private static final String kDefaultAuto = "Default";
+  private static final String kCustomAuto = "My Auto";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+    private Command PathBlueLeft1 = drivetrain.getAutoPath("PathBlueLeft1");
+    private Command PathBlueLeft2 = drivetrain.getAutoPath("PathBlueLeft2");
+
+
+ 
+
+
 
   private void configureBindings() 
   {
@@ -72,27 +92,40 @@ public class RobotContainer {
    
    // SHOOTING BUTTONS
 
+       JoystickButton shootManual = new JoystickButton(joystick,PS4Controller.Button.kCross.value);
+       shootManual.whileTrue(new ShootCommand(shooter, -0.1));
+
    //calls a  parallel command to start first the shooter and a few seconds later the feeder
    JoystickButton shootHigh = new JoystickButton(joystick,PS4Controller.Button.kCircle.value); 
     shootHigh.onTrue(
     (Commands.parallel(
-      Commands.waitSeconds(3.4).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
+      Commands.waitSeconds(3).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
       new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
       new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
      )).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
      // new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
 
+
   // shootHigh.whileTrue(new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh));
+///////////////////////////////////////////////////////
+   
+JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kCross.value);
+    //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(0.13).asProxy().andThen(new Feed(intake,1).withTimeout(1)), new RotateIntakeCommand(intake,35,1)));
 
-    JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kCross.value);
+    //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(1.6).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
+   // new RotateIntakeCommand(intake, 40 )));//Calls the shootCommand with a speed parameter that makes it shoot low
+
+   //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(2).asProxy().andThen(new Feed(intake,1).withTimeout(1)), new RotateIntakeCommand(intake,22)));
+   //shootLow.onTrue(Commands.parallel(Commands.waitSeconds(0.13).asProxy().andThen(new Feed(intake,1).withTimeout(1)), new RotateIntakeCommand(intake,35,1)));
+/*shootLow.onTrue(new MoveLiftCommand(lift, -420)
+.andThen(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(0.7),new Feed(intake, 0.8).withTimeout(2))
+.andThen(new MoveLiftCommand(lift, -480)).andThen(new SolenoidUp(lift).withTimeout(.9))
+.andThen(new SolenoidDown(lift).withTimeout(0.2))).andThen(new MoveLiftCommand(lift,0)));
+*/
+
+shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2),Commands.waitSeconds(0.5).andThen(new Feed(intake,1))));
     
-    shootLow.onTrue(Commands.parallel(Commands.waitSeconds(1.2).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
-    new RotateIntakeCommand(intake, 40 )));//Calls the shootCommand with a speed parameter that makes it shoot low
-
- 
-
-    
-//INTAKE BUTTON
+//INTAKE BUTTON)
 
     JoystickButton collectNote = new JoystickButton(joystick , PS4Controller.Button.kR1.value);
     collectNote.whileTrue(new Collect(intake, -Constants.IntakeConstants.collectSpeed));
@@ -101,18 +134,18 @@ public class RobotContainer {
     releaseNote.whileTrue(new Feed(intake, Constants.IntakeConstants.releaseSpeed));
 
 
-    JoystickButton rotateFree = new JoystickButton(joystick , PS4Controller.Button.kR2.value);
+    JoystickButton rotateIn = new JoystickButton(joystick , PS4Controller.Button.kL2.value);
     //rotateFree.whileTrue(new RotateFree(intake, Constants.IntakeConstants.kMaxAbsOutputRBExtended));
-    rotateFree.onTrue(new RotateIntakeCommand(intake, 0));
+    rotateIn.onTrue(new RotateIntakeCommand(intake, 2));
 
 
-    JoystickButton rotateInverse = new JoystickButton(joystick , PS4Controller.Button.kL2.value);
+    JoystickButton rotateOut = new JoystickButton(joystick , PS4Controller.Button.kR2.value);
     //rotateInverse.whileTrue(new RotateFree(intake, -Constants.IntakeConstants.kMaxAbsOutputRBRetracted));
-     rotateInverse.onTrue(new RotateIntakeCommand(intake, 48));
+     rotateOut.onTrue(new RotateIntakeCommand(intake, 55));
 
-     JoystickButton toggleIntake = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
+     //JoystickButton toggleIntake = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
 
-     toggleIntake.onTrue(new ToggleIntakeCommand(intake, 48, 0));
+     //toggleIntake.onTrue(new ToggleIntakeCommand(intake, 48, 0));
 
      
 
@@ -131,9 +164,22 @@ public class RobotContainer {
     //JoystickButton openSoleButton = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
     //openSoleButton.onTrue(new SolenoidDown(lift));
 
-    JoystickButton toggleSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value);
+    JoystickButton upSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value);
 
-    toggleSoleButton.onTrue(new ToggleSolenoid(lift));
+    upSoleButton.onTrue(new SolenoidDown(lift));
+    
+
+    JoystickButton downSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
+
+    downSoleButton.onTrue(new SolenoidUp(lift));
+
+    JoystickButton prepForLow = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
+
+    prepForLow.onTrue(new MoveLiftCommand(lift, -500));
+
+    JoystickButton endLow = new JoystickButton(joystick, PS4Controller.Button.kL3.value);
+
+    endLow.onTrue(new MoveLiftCommand(lift, 0));
 
     
     
@@ -146,6 +192,20 @@ public class RobotContainer {
 
   public RobotContainer() 
   {
+    intake.resetRotateEncoder();
+    lift.resetLiftEncoder();
+    shooter.resetShooterEncoder();
+
+    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    m_chooser.addOption("Auto1", kCustomAuto);
+    m_chooser.addOption("Auto2", kCustomAuto);
+    m_chooser.addOption("Auto3", kCustomAuto);
+    m_chooser.addOption("Auto4", kCustomAuto);
+    SmartDashboard.putData("Auto choices", m_chooser);
+
+  
+
+
     configureBindings();
   }
 

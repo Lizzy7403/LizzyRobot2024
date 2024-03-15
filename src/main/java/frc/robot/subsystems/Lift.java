@@ -40,7 +40,7 @@ public class Lift extends SubsystemBase {
 
   public Lift() {
     liftMotor = new CANSparkMax(Constants.LiftConstants.MOTOR_ID, MotorType.kBrushless);
-    liftMotor.setOpenLoopRampRate(0.5);
+  
     
     
 

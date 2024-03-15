@@ -178,6 +178,7 @@ public class Intake extends SubsystemBase {
     
 
     if(limitSwitch1.get() || limitSwitch2.get() || limitSwitch3.get()){
+      
       return true;
     
     }
@@ -210,6 +211,8 @@ public class Intake extends SubsystemBase {
     return m_rotateEncoder.getPosition();
   }
 
+
+
   // Method to reset the position of the intake
   // This is done by setting the position of the encoder to 0
   public void resetRotateEncoder() {
@@ -223,6 +226,12 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake ENC POS", m_rotateEncoder.getPosition());
     //SmartDashboard.putNumber("Intake ENC SP", m_rotateEncoder.getVelocity());
     SmartDashboard.putBoolean("Intake limitswitch", getLimitSwitch());
+    SmartDashboard.putBoolean("limitSwitch1", limitSwitch1.get());
+    SmartDashboard.putBoolean("limitSwitch2", limitSwitch2.get());
+    SmartDashboard.putBoolean("limitSwitch3", limitSwitch3.get());
+    SmartDashboard.putBoolean("isExtended", isExtended);
+
+
     
   }
 }

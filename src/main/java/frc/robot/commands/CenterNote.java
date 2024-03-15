@@ -15,17 +15,13 @@ public class CenterNote extends Command {
 
     // The speed at which the intake should spin
     // This is a double value between -1.0 and 1.0
-    private final double speed;
-    private final double time;
 
 
     // The constructor for the SpinIntakeCommand class
     // This is called when a SpinIntakeCommand object is created
     // The Intake object and the speed passed as parameters are the subsystem and the speed that the command will operate on
-    public CenterNote(Intake intake, double speed, double time) {
+    public CenterNote(Intake intake) {
         this.intake = intake;
-        this.speed = speed;
-        this.time = time;
     
         // This command requires the intake subsystem
         // This means that no other command that requires the intake subsystem can run at the same time as this command
@@ -39,10 +35,18 @@ public class CenterNote extends Command {
     @Override
     public void initialize() {
 
-     intake.spinIntake(speed);
+     //intake.spinIntake(speed);
+     //for(int i = 0; i < 3; i++){
+     //  intake.getLimitSwitch(){
+      //      intake.spinIntake(-.3);
+      //  }
+       // while (!intake.getLimitSwitch()){
+       //     intake.spinIntake(.3);
+       // }
+     }
+     
 
 
-    }
 
     // The end method is called once when the command ends
     // For this command, the intake stops spinning when the command ends
@@ -56,6 +60,6 @@ public class CenterNote extends Command {
     // For this command, it is never finished on its own, it will run until it's explicitly interrupted
     @Override
     public boolean isFinished() {
-        return intake.getLimitSwitch(); // This command will run until it's explicitly interrupted
+        return false; // This command will run until it's explicitly interrupted
     }
 }

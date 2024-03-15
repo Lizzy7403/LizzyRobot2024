@@ -4,6 +4,11 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 // Importing the CANSparkMax class from the REV Robotics library
 // This class provides methods to control the Spark MAX motor controller
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Importing the MotorType enum from the REV Robotics library
 // This enum provides constants to specify the type of motor (brushed or brushless)
@@ -26,6 +31,12 @@ public class Shooter extends SubsystemBase {
   // This is also a Spark MAX motor controller controlling a brushless motor
   private final CANSparkMax shooterMotor2;
 
+  // SHOOTER PID INSTANCE VARIABLES
+   private SparkPIDController pidShooterController;
+
+  private final RelativeEncoder shooterEncoder;
+
+   
   // The constructor for the Shooter class
   // This is called when a Shooter object is created
   public Shooter() {
@@ -36,6 +47,28 @@ public class Shooter extends SubsystemBase {
     shooterMotor2 = new CANSparkMax(Constants.ShooterConstants.MOTOR_2_ID, CANSparkLowLevel.MotorType.kBrushless);
 
     shooterMotor2.follow(shooterMotor1, true);
+
+    //shooterMotor1.setOpenLoopRampRate(0.5);
+    //shooterMotor2.setOpenLoopRampRate(0.5);
+    shooterEncoder = shooterMotor1.getEncoder();
+
+    pidShooterController = shooterMotor1.getPIDController();
+
+    pidShooterController.setFeedbackDevice(shooterEncoder);
+  
+    pidShooterController.setP(Constants.ShooterConstants.KPShoot);
+    pidShooterController.setI(Constants.ShooterConstants.kIShoot);
+    pidShooterController.setD(Constants.ShooterConstants.kDShoot);
+    pidShooterController.setIZone(Constants.ShooterConstants.kIzShoot);
+    pidShooterController.setFF(Constants.ShooterConstants.kFFShoot);
+pidShooterController.setOutputRange( -1 * Constants.ShooterConstants.kShooterLowMaxOutput, Constants.ShooterConstants.kShooterLowMaxOutput);
+
+//    shooterMotor1.setClosedLoopRampRate(1);
+shooterMotor1.setClosedLoopRampRate(1);
+shooterMotor2.setClosedLoopRampRate(1);
+
+
+
   }
 
   // Method to set the speed of the shooter motors
@@ -51,12 +84,26 @@ public class Shooter extends SubsystemBase {
     // Set the speed of the first shooter motor and second shooter motor to the specified speed
     
     shooterMotor1.set(speed);
-    
-    //shooterMotor1.setOpenLoopRampRate(.5);
-    //shooterMotor2.setOpenLoopRampRate(.5);
+  
+  }
+
+  public double getShooterPosition(){
+
+  return shooterEncoder.getPosition();
 
   }
 
+  public void setPosition(double position){
+
+    pidShooterController.setReference(position, ControlType.kPosition);
+
+
+  }
+
+  public void resetShooterEncoder(){
+
+    shooterEncoder.setPosition(0);
+  }
   // Method to stop the shooter motors
   // This is done by setting the speed of both motors to 0
   public void stopShooter() {
@@ -67,5 +114,7 @@ public class Shooter extends SubsystemBase {
   // Currently, it does not perform any operations
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("Shooter Encoder", shooterEncoder.getPosition());
   }
 }

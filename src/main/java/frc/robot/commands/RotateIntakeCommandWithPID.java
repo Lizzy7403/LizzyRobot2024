@@ -27,6 +27,7 @@ public class RotateIntakeCommandWithPID extends Command {
         this.kD = kD;
         this.kIz = kIz;
         this.kFF = kFF;
+        
     }
 
     // The initialize method is called once when the command is started

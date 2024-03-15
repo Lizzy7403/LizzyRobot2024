@@ -48,11 +48,11 @@ public class ToggleIntakeCommand extends Command {
         } else {
             new RotateIntakeCommandWithPID(intake, setpointExtended, false, Constants.IntakeConstants.kP2, Constants.IntakeConstants.kI2, Constants.IntakeConstants.kD2, Constants.IntakeConstants.kIz2, Constants.IntakeConstants.kFF2).schedule();
         }
+        Intake.setIsExtended(Intake.isExtended());
     }
 
     @Override
   public void end(boolean interrupted) {
-    Intake.setIsExtended(Intake.isExtended());
   }
 
     // The isFinished method is called to determine when the command is finished

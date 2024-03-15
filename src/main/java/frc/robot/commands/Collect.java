@@ -38,8 +38,6 @@ public class Collect extends Command {
     public void initialize() {
 
      intake.spinIntake(speed);
-
-
     }
 
     // The end method is called once when the command ends
@@ -47,13 +45,23 @@ public class Collect extends Command {
     // The boolean parameter interrupted is true if the command ended because it was interrupted
     @Override
     public void end(boolean interrupted) {
-        intake.spinIntake(0); // Stop the intake roller when the command ends
-    }
+    
+    intake.spinIntake(0);
+    
+      //if(intake.getLimitSwitch()){
+    //new RotateIntakeCommand(intake, 2).schedule();
+    //new CenterNote(intake).schedule();*/
+      //}
+        }
+      //  intake.spinIntake(0); // Stop the intake roller when the command ends
+    
 
     // The isFinished method is called to determine when the command is finished
     // For this command, it is never finished on its own, it will run until it's explicitly interrupted
     @Override
     public boolean isFinished() {
-        return intake.getLimitSwitch(); // This command will run until it's explicitly interrupted
+       return false;
+        // return intake.getLimitSwitch(); // This command will run until it's explicitly interrupted
     }
+
 }

@@ -59,7 +59,7 @@ public class RotateIntakeCommand extends Command {
     // For this command, the intake starts rotating to the specified setpoint when the command is started
     @Override
     public void initialize() {
-        intake.rotateIntake(setpoint);
+        intake.rotateIntake(setpoint); 
     }
 
     // The execute method is called repeatedly until the command ends

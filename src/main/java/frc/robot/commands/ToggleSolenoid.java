@@ -18,7 +18,7 @@ public class ToggleSolenoid extends Command {
 
   /** Creates a new SolenoidUp. */
   public ToggleSolenoid(Lift lift) {
-   addRequirements(lift);// here to declare subsystem dependencies.
+   //addRequirements(lift);// here to declare subsystem dependencies.
    this.lift = lift;
    
 
@@ -42,17 +42,13 @@ public class ToggleSolenoid extends Command {
   @Override
   public void execute() {
 
-    if(lift.isSolenoidUp()){
-      lift.openSolenoid();
-    } else {
-      lift.closeSolenoid();
-    }
+  
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    lift.setIsSolenoidUp(!lift.isSolenoidUp());
+
   }
 
   // Returns true when the command should end.
