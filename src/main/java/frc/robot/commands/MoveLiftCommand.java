@@ -48,7 +48,7 @@ public class MoveLiftCommand extends Command {
     @Override
     public boolean isFinished() {
 
-        if(Math.abs(lift.getLiftEncoderPostion()-position)<3){
+        if(Math.abs(lift.getLiftEncoderPostion()-position)<10){
             
             return true;
 

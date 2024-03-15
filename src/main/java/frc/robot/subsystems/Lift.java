@@ -90,6 +90,10 @@ public class Lift extends SubsystemBase {
     liftEncoder.setPosition(0);
   }
 
+  public void setLiftEncoder(double num) {
+    liftEncoder.setPosition(num);
+  }
+
   public void stopLift() {
     liftMotor.set(0);
   }

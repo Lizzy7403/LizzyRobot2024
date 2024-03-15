@@ -75,17 +75,16 @@ public class RobotContainer {
    //private SendableChooser<Command> m_chooser = new SendableChooser<>();
 
     private Command autopath1 = drivetrain.getAutoPath("autopath1");
-    private Command autopath2 = drivetrain.getAutoPath("autopath2");
-    private Command autopath3 = drivetrain.getAutoPath("autopath3");
+   private Command autopath2 = drivetrain.getAutoPath("autopath2");
+   // private Command autopath3 = drivetrain.getAutoPath("autopath3");
     //private Command autopath4 = drivetrain.getAutoPath("autopath4");
     //private Command autopath5 = drivetrain.getAutoPath("autopath5");
     //private Command autopath6 = drivetrain.getAutoPath("autopath6");
 
     private Command shootSp = Commands.parallel(
-        Commands.waitSeconds(3).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
-        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
-        new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
-      ).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos));
+        Commands.waitSeconds(1).asProxy().andThen(new Feed(intake,1).withTimeout(2)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(3)
+      );
 
     /*private Command blueAutoLeft = shootSp.andThen(new RotateIntakeCommand(intake, 55))
     .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
@@ -189,8 +188,8 @@ shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout
 
   public RobotContainer() 
   {
+    lift.setLiftEncoder(Constants.LiftConstants.kShootPos);
     intake.resetRotateEncoder();
-    lift.resetLiftEncoder();
     shooter.resetShooterEncoder();
    
     //AutoBuilder.buildAutoChooser();
@@ -203,8 +202,11 @@ shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout
   public Command getAutonomousCommand() { //Uses the program from Path planner to create an autonomous code
     
     return shootSp.andThen(new RotateIntakeCommand(intake, 55))
-    .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
+    .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(2)))
     .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-    .andThen(autopath2).andThen(shootSp).andThen(autopath3); //m_chooser.getSelected();
+    .andThen(autopath2).andThen(Commands.parallel(
+        Commands.waitSeconds(1).asProxy().andThen(new Feed(intake,1).withTimeout(2)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(3)
+      ).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
 }
 }

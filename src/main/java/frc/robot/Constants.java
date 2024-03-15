@@ -44,7 +44,7 @@ public final class Constants {
         //max output at shooter class
         public static final double kMaxAbsOutput = 1;
         //max output at robot container class for high shot
-        public static final double kMaxAbsOutputRBHigh = -0.7;
+        public static final double kMaxAbsOutputRBHigh = -0.8;
         //max output at robot container class for low shot
         public static final double kMaxAbsOutputRBLow = -0.2;
        
