@@ -28,31 +28,9 @@ public class Robot extends TimedRobot{
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    cameraThread = new Thread(
-            () -> {
-              // Get the camera from the server
-              //UsbCamera camera = CameraServer.startAutomaticCapture();
+    
+    CameraServer.startAutomaticCapture();
 
-              // Capture Mats from the camera
-              CvSink cvSink = CameraServer.getVideo();
-              // Setup a CvSource
-              CvSource outputStream = CameraServer.putVideo("Camera", 640, 480);
-              Mat mat = new Mat();
-
-              while (!Thread.interrupted()) {
-                if (cvSink.grabFrame(mat) == 0) {
-                  outputStream.notifyError(cvSink.getError());
-                  continue;
-                }
-                // Put a rectangle on the image
-                Imgproc.rectangle(
-                    mat, new Point(100, 100), new Point(400, 400), new Scalar(255, 255, 255), 5);
-                // Give the output stream a new image to display
-                outputStream.putFrame(mat);
-              }
-            });
-    cameraThread.setDaemon(true);
-    cameraThread.start();
   }
 
   @Override

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.lang.annotation.Retention;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -30,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.MoveLiftCommand;
 import frc.robot.commands.RotateFree;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LiftConstants;
 import frc.robot.commands.Collect;
 import frc.robot.commands.Feed;
@@ -75,40 +78,14 @@ public class RobotContainer {
 
   private Command autopath1 = drivetrain.getAutoPath("autopath1");
   private Command autopath2 = drivetrain.getAutoPath("autopath2");
-  // private Command autopath3 = drivetrain.getAutoPath("autopath3");
-  // private Command autopath4 = drivetrain.getAutoPath("autopath4");
-  // private Command autopath5 = drivetrain.getAutoPath("autopath5");
-  // private Command autopath6 = drivetrain.getAutoPath("autopath6");
+  private Command autopath3 = drivetrain.getAutoPath("autopath3");
+  private Command autopath4 = drivetrain.getAutoPath("autopath4");
+  private Command autopath5 = drivetrain.getAutoPath("autopath5");
+  private Command autopath6 = drivetrain.getAutoPath("autopath6");
+  private Command autopath7 = drivetrain.getAutoPath("autopath7");
 
-  /*
-   * private Command blueAutoLeft = shootSp.andThen(new
-   * RotateIntakeCommand(intake, 55))
-   * .andThen(Commands.parallel(autopath1,new
-   * Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-   * .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-   * .andThen(autopath2).andThen(shootSp).andThen(Commands.parallel(autopath3,new
-   * Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));
-   */
 
-  /*
-   * private Command blueAutoCenter = shootSp.andThen(new
-   * RotateIntakeCommand(intake, 55))
-   * .andThen(Commands.parallel(autopath4,new
-   * Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-   * .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-   * .andThen(autopath5).andThen(shootSp).andThen(Commands.parallel(autopath3,new
-   * Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));
-   */
-
-  /*
-   * private Command blueAutoRight = shootSp.andThen(new
-   * RotateIntakeCommand(intake, 55))
-   * .andThen(Commands.parallel(autopath4,new
-   * Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-   * .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-   * .andThen(autopath5).andThen(shootSp)6.andThen(Commands.parallel(autopath3,new
-   * Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));
-   */
+  
 
   private void configureBindings() {
 
@@ -197,7 +174,8 @@ public class RobotContainer {
     intake.resetRotateEncoder();
     shooter.resetShooterEncoder();
 
-    AutoBuilder.buildAutoChooser();
+    m_chooser.addOption("BlueAutoLeftSpeaker", blueAutoLeftSpeaker());
+    m_chooser.addOption("BlueAutoCenterSpeaker", blueAutoCenterSpeaker());
     SmartDashboard.putData("Sendable Chooser", m_chooser);
 
     configureBindings();
@@ -209,11 +187,61 @@ public class RobotContainer {
         new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2.5));
   }
 
-  public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code
+  private Command riskyShoot() {
+    return Commands.parallel(
+        Commands.waitSeconds(1.25).asProxy().andThen(new Feed(intake, 1).withTimeout(0.75)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2));
+  }
+
+  private Command autoCenter(){
+
+    return new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(0.2)
+    .andThen(new Feed(intake,1).withTimeout(0.2).andThen(new Collect(intake,IntakeConstants.collectSpeed).withTimeout(0.2)));
+  }
+
+  // AUTOS 
+
+  private Command blueAutoLeftSpeaker(){
+
+return
+autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(
+            Commands.parallel(autopath1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+        .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+        Commands.parallel(autopath2, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(autopath3);
+
+  }
+
+  private Command blueAutoCenterSpeaker(){
+
+    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
+    .andThen( Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+        Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(autopath6);
+  }
+
+  /*private Command blueAutoCenterSpeaker17(){
+
     return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+    .andThen( Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+        Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)).
+        Commands.parallel(autopath7, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2));
+  }*/
+
+  
+
+  public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code
+    return m_chooser.getSelected();
+    
+    
+    /*autoShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
             Commands.parallel(autopath1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
         .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
         .andThen(autopath2).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos));
-  }
+  */
+      }
 }
