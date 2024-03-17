@@ -83,9 +83,11 @@ public class RobotContainer {
   private Command autopath5 = drivetrain.getAutoPath("autopath5");
   private Command autopath6 = drivetrain.getAutoPath("autopath6");
   private Command autopath7 = drivetrain.getAutoPath("autopath7");
+  private Command autopath75 = drivetrain.getAutoPath("autopath7.5");
+  private Command autopath8 = drivetrain.getAutoPath("autopath8");
+  private Command autopath9 = drivetrain.getAutoPath("autopath9");
+  private Command autopath10 = drivetrain.getAutoPath("autopath10");
 
-
-  
 
   private void configureBindings() {
 
@@ -107,17 +109,19 @@ public class RobotContainer {
     // calls a parallel command to start first the shooter and a few seconds later
     // the feeder
     JoystickButton shootHigh = new JoystickButton(joystick, PS4Controller.Button.kCircle.value);
-    /*shootHigh.onTrue(Commands.parallel(
-        Commands.waitSeconds(4).asProxy().andThen(new Feed(intake, 1).withTimeout(1)),
-        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
-        new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos))
-        .andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
-        */
-      
-      shootHigh.onTrue(Commands.parallel(
+    /*
+     * shootHigh.onTrue(Commands.parallel(
+     * Commands.waitSeconds(4).asProxy().andThen(new Feed(intake,
+     * 1).withTimeout(1)),
+     * new ShootCommand(shooter,
+     * Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
+     * new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos))
+     * .andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
+     */
+
+    shootHigh.onTrue(Commands.parallel(
         Commands.waitSeconds(1.5).asProxy().andThen(new Feed(intake, 1).withTimeout(1)),
         new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2.5)));
-
 
     JoystickButton shootLow = new JoystickButton(joystick, PS4Controller.Button.kCross.value);
     shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(1),
@@ -176,9 +180,17 @@ public class RobotContainer {
 
     m_chooser.addOption("BlueAutoLeftSpeaker", blueAutoLeftSpeaker());
     m_chooser.addOption("BlueAutoCenterSpeaker", blueAutoCenterSpeaker());
+    m_chooser.addOption("BlueAutoRightSpeaker", blueAutoRightSpeaker());
+    m_chooser.addOption("17PointAuto", blueAutoCenterSpeaker17());
     SmartDashboard.putData("Sendable Chooser", m_chooser);
 
     configureBindings();
+  }
+
+  private Command safetyShoot() {
+    return Commands.parallel(
+        Commands.waitSeconds(2).asProxy().andThen(new Feed(intake, 1).withTimeout(1.5)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(3.5));
   }
 
   private Command autoShoot() {
@@ -193,55 +205,76 @@ public class RobotContainer {
         new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2));
   }
 
-  private Command autoCenter(){
+  private Command autoCenter() {
 
-    return new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(0.2)
-    .andThen(new Feed(intake,1).withTimeout(0.2).andThen(new Collect(intake,IntakeConstants.collectSpeed).withTimeout(0.2)));
+    return new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(0.2)
+        .andThen(new Feed(intake, 1).withTimeout(0.2)
+            .andThen(new Collect(intake, IntakeConstants.collectSpeed).withTimeout(0.2)));
   }
 
-  // AUTOS 
+  // AUTOS
 
-  private Command blueAutoLeftSpeaker(){
+  private Command blueAutoLeftSpeaker() {
 
-return
-autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+    return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
             Commands.parallel(autopath1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-        Commands.parallel(autopath2, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+            Commands.parallel(autopath2,
+                Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
+        .andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
         .andThen(autopath3);
 
   }
 
-  private Command blueAutoCenterSpeaker(){
+  private Command blueAutoCenterSpeaker() {
 
     return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
-    .andThen( Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
-    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-        Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(
+            Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+        .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+            Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter())))
+        .andThen(riskyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
         .andThen(autopath6);
   }
 
-  /*private Command blueAutoCenterSpeaker17(){
+  private Command blueAutoRightSpeaker() {
 
-    return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
-    .andThen( Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
-    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-        Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)).
-        Commands.parallel(autopath7, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2));
-  }*/
+    return safetyShoot().andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(
+            Commands.parallel(autopath8, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+        .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+            Commands.parallel(autopath9, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
+        .andThen(safetyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(autopath10);
+  }
 
   
+   private Command blueAutoCenterSpeaker17(){
+    
+    return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+    .andThen( Commands.parallel(autopath4, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+    Commands.parallel(autopath5,
+    Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
+    autoCenter()))).andThen(autoShoot()).andThen(
+    Commands.parallel(autopath7, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
+    }
+   
 
   public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code
     return m_chooser.getSelected();
-    
-    
-    /*autoShoot().andThen(new RotateIntakeCommand(intake, 55))
-        .andThen(
-            Commands.parallel(autopath1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
-        .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-        .andThen(autopath2).andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos));
-  */
-      }
+
+    /*
+     * autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+     * .andThen(
+     * Commands.parallel(autopath1, new Collect(intake,
+     * Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+     * .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
+     * .andThen(autopath2).andThen(autoShoot()).andThen(new MoveLiftCommand(lift,
+     * LiftConstants.kUnderChainPos));
+     */
+  }
 }
