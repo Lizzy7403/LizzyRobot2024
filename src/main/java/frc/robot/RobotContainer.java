@@ -40,6 +40,7 @@ import frc.robot.commands.MoveLift;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootPID;
 import frc.robot.commands.SolenoidDown;
+import frc.robot.commands.SolenoidFinal;
 import frc.robot.commands.SolenoidUp;
 import frc.robot.commands.ToggleIntakeCommand;
 import frc.robot.commands.ToggleSolenoid;
@@ -122,6 +123,7 @@ public class RobotContainer {
     shootHigh.onTrue(Commands.parallel(
         Commands.waitSeconds(1.5).asProxy().andThen(new Feed(intake, 1).withTimeout(1)),
         new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2.5)));
+    
 
     JoystickButton shootLow = new JoystickButton(joystick, PS4Controller.Button.kCross.value);
     shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(1),
@@ -158,6 +160,11 @@ public class RobotContainer {
     JoystickButton downSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
 
     downSoleButton.onTrue(new SolenoidUp(lift));
+
+    JoystickButton finalSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTouchpad.value);
+
+    finalSoleButton.onTrue(new SolenoidFinal(lift));
+
 
     JoystickButton prepForLow = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
 
