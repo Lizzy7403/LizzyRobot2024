@@ -115,7 +115,7 @@ public final class Constants {
             public static final int ButtonShare = 9;
             public static final int ButtonOption = 10;
             public static final int PSButton = 15;
-            public static final int TouchPad = 16;
+            public static final int TouchPad = 14;
             public static final int joystickPort = 0;
 
 

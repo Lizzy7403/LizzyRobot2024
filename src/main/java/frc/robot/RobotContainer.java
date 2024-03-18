@@ -29,8 +29,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.MoveLiftCommand;
+import frc.robot.commands.RetractSolenoidFinal;
 import frc.robot.commands.RotateFree;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LiftConstants;
@@ -76,6 +79,8 @@ public class RobotContainer {
   ////////////////////////////////////////////// ./////////////////////
 
   private SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private Command climb = new SolenoidFinal(lift);
+  
 
   private Command autopath1 = drivetrain.getAutoPath("autopath1");
   private Command autopath2 = drivetrain.getAutoPath("autopath2");
@@ -84,7 +89,7 @@ public class RobotContainer {
   private Command autopath5 = drivetrain.getAutoPath("autopath5");
   private Command autopath6 = drivetrain.getAutoPath("autopath6");
   private Command autopath7 = drivetrain.getAutoPath("autopath7");
-  private Command autopath75 = drivetrain.getAutoPath("autopath7.5");
+  private Command autopath75 = drivetrain.getAutoPath("autopath75");
   private Command autopath8 = drivetrain.getAutoPath("autopath8");
   private Command autopath9 = drivetrain.getAutoPath("autopath9");
   private Command autopath10 = drivetrain.getAutoPath("autopath10");
@@ -161,9 +166,15 @@ public class RobotContainer {
 
     downSoleButton.onTrue(new SolenoidUp(lift));
 
-    JoystickButton finalSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTouchpad.value);
+    //JoystickButton finalSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value );
 
-    finalSoleButton.onTrue(new SolenoidFinal(lift));
+    //finalSoleButton.onTrue(new SolenoidFinal(lift));
+
+    POVButton finalSol = new POVButton(joystick, 0);
+    finalSol.onTrue(new SolenoidFinal(lift));
+
+    POVButton retractfinalSol = new POVButton(joystick, 180);
+    retractfinalSol.onTrue(new RetractSolenoidFinal(lift));
 
 
     JoystickButton prepForLow = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
@@ -188,8 +199,11 @@ public class RobotContainer {
     m_chooser.addOption("BlueAutoLeftSpeaker", blueAutoLeftSpeaker());
     m_chooser.addOption("BlueAutoCenterSpeaker", blueAutoCenterSpeaker());
     m_chooser.addOption("BlueAutoRightSpeaker", blueAutoRightSpeaker());
-    m_chooser.addOption("17PointAuto", blueAutoCenterSpeaker17());
+    //m_chooser.addOption("17PointAuto", blueAutoCenterSpeaker17());
     SmartDashboard.putData("Sendable Chooser", m_chooser);
+
+    
+
 
     configureBindings();
   }
@@ -257,18 +271,19 @@ public class RobotContainer {
   }
 
   
-   private Command blueAutoCenterSpeaker17(){
+  /**private Command blueAutoCenterSpeaker17(){
     
-    return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
     .andThen( Commands.parallel(autopath4, new Collect(intake,
     Constants.IntakeConstants.collectSpeed).withTimeout(2)))
     .andThen(new RotateIntakeCommand(intake, 0)).andThen(
     Commands.parallel(autopath5,
     Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
-    autoCenter()))).andThen(autoShoot()).andThen(
+    autoCenter()))).andThen(riskyShoot()).andThen(
     Commands.parallel(autopath7, new Collect(intake,
     Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
     }
+    */
    
 
   public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code

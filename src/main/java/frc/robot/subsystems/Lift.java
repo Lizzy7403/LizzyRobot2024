@@ -73,6 +73,10 @@ public class Lift extends SubsystemBase {
     m_finalSolenoid.set(true);
   }
 
+  public void retractFinalSolenoid(){
+    m_finalSolenoid.set(false);
+  }
+
   public boolean isSolenoidUp() {
       return isSolenoidUp;
   }

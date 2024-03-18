@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Lift;
 
 
-public class SolenoidFinal extends Command {
+public class RetractSolenoidFinal extends Command {
 
   private final Lift lift;
 
 
   /** Creates a new SolenoidUp. */
-  public SolenoidFinal(Lift lift) {
+  public RetractSolenoidFinal(Lift lift) {
    addRequirements(lift);// here to declare subsystem dependencies.
    this.lift = lift;
 
@@ -26,7 +26,7 @@ public class SolenoidFinal extends Command {
   @Override
   public void initialize() {
 
-    lift.moveFinalSolenoid();
+    lift.retractFinalSolenoid();
 
   }
 
@@ -34,7 +34,7 @@ public class SolenoidFinal extends Command {
   @Override
   public void execute() {
 
-    lift.moveFinalSolenoid();
+    lift.retractFinalSolenoid();
   }
 
   // Called once the command ends or is interrupted.
