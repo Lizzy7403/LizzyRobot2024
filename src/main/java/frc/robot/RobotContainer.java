@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.lang.annotation.Retention;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -19,7 +21,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,9 +29,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.MoveLiftCommand;
+import frc.robot.commands.RetractSolenoidFinal;
 import frc.robot.commands.RotateFree;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LiftConstants;
 import frc.robot.commands.Collect;
 import frc.robot.commands.Feed;
@@ -38,6 +43,7 @@ import frc.robot.commands.MoveLift;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootPID;
 import frc.robot.commands.SolenoidDown;
+import frc.robot.commands.SolenoidFinal;
 import frc.robot.commands.SolenoidUp;
 import frc.robot.commands.ToggleIntakeCommand;
 import frc.robot.commands.ToggleSolenoid;
@@ -47,19 +53,19 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Intake;
 
-
 public class RobotContainer {
 
   private final Shooter shooter = new Shooter();
   private final Lift lift = new Lift();
-  private final Intake intake =new Intake();
+  private final Intake intake = new Intake();
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final PS4Controller joystick = new PS4Controller(Constants.PS4GamePad.joystickPort);
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
   private double MaxSpeed = Constants.Swerve.maxSpeedMperS; // 6 meters per second desired top speed
-  private double MaxAngularRate = Constants.Swerve.maxAngularRate * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double MaxAngularRate = Constants.Swerve.maxAngularRate * Math.PI; // 3/4 of a rotation per second max angular
+                                                                             // velocity
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.2) // Add a 10% deadband
@@ -69,43 +75,28 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  ////////////////////////////////////////////// AUTO CONFIGURATION ./////////////////////
+  ////////////////////////////////////////////// AUTO CONFIGURATION
+  ////////////////////////////////////////////// ./////////////////////
 
-   //private String m_autoSelected;
-   //private SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private Command climb = new SolenoidFinal(lift);
+  
 
-    private Command autopath1 = drivetrain.getAutoPath("autopath1");
-    private Command autopath2 = drivetrain.getAutoPath("autopath2");
-    private Command autopath3 = drivetrain.getAutoPath("autopath3");
-    //private Command autopath4 = drivetrain.getAutoPath("autopath4");
-    //private Command autopath5 = drivetrain.getAutoPath("autopath5");
-    //private Command autopath6 = drivetrain.getAutoPath("autopath6");
-
-    private Command shootSp = Commands.parallel(
-        Commands.waitSeconds(3).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
-        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
-        new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
-      ).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos));
-
-    /*private Command blueAutoLeft = shootSp.andThen(new RotateIntakeCommand(intake, 55))
-    .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-    .andThen(autopath2).andThen(shootSp).andThen(Commands.parallel(autopath3,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));*/
-
-    /*private Command blueAutoCenter = shootSp.andThen(new RotateIntakeCommand(intake, 55))
-    .andThen(Commands.parallel(autopath4,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-    .andThen(autopath5).andThen(shootSp).andThen(Commands.parallel(autopath3,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));*/
-
-    /*private  Command blueAutoRight = shootSp.andThen(new RotateIntakeCommand(intake, 55))
-    .andThen(Commands.parallel(autopath4,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-    .andThen(autopath5).andThen(shootSp)6.andThen(Commands.parallel(autopath3,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)));*/
+  private Command autopath1 = drivetrain.getAutoPath("autopath1");
+  private Command autopath2 = drivetrain.getAutoPath("autopath2");
+  private Command autopath3 = drivetrain.getAutoPath("autopath3");
+  private Command autopath4 = drivetrain.getAutoPath("autopath4");
+  private Command autopath5 = drivetrain.getAutoPath("autopath5");
+  private Command autopath6 = drivetrain.getAutoPath("autopath6");
+  private Command autopath7 = drivetrain.getAutoPath("autopath7");
+  private Command autopath75 = drivetrain.getAutoPath("autopath75");
+  private Command autopath8 = drivetrain.getAutoPath("autopath8");
+  private Command autopath9 = drivetrain.getAutoPath("autopath9");
+  private Command autopath10 = drivetrain.getAutoPath("autopath10");
 
 
-  private void configureBindings() 
-  {
-    
+  private void configureBindings() {
+
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
                                                                                            // negative Y (forward)
@@ -113,62 +104,78 @@ public class RobotContainer {
             .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
+    JoystickButton pointToDirection = new JoystickButton(joystick, PS4Controller.Button.kPS.value);
+    pointToDirection.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
-   JoystickButton pointToDirection = new JoystickButton(joystick, PS4Controller.Button.kPS.value);
-   pointToDirection.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    // SHOOTING BUTTONS
 
-   
-   // SHOOTING BUTTONS
+    JoystickButton shootManual = new JoystickButton(joystick, PS4Controller.Button.kCross.value);
+    shootManual.whileTrue(new ShootCommand(shooter, -0.1));
 
-       JoystickButton shootManual = new JoystickButton(joystick,PS4Controller.Button.kCross.value);
-       shootManual.whileTrue(new ShootCommand(shooter, -0.1));
+    // calls a parallel command to start first the shooter and a few seconds later
+    // the feeder
+    JoystickButton shootHigh = new JoystickButton(joystick, PS4Controller.Button.kCircle.value);
+    /*
+     * shootHigh.onTrue(Commands.parallel(
+     * Commands.waitSeconds(4).asProxy().andThen(new Feed(intake,
+     * 1).withTimeout(1)),
+     * new ShootCommand(shooter,
+     * Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
+     * new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos))
+     * .andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
+     */
 
-   //calls a  parallel command to start first the shooter and a few seconds later the feeder
-   JoystickButton shootHigh = new JoystickButton(joystick,PS4Controller.Button.kCircle.value); 
-    shootHigh.onTrue( Commands.parallel(
-        Commands.waitSeconds(4).asProxy().andThen(new Feed(intake,1).withTimeout(1)),
-        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(5.5),
-        new MoveLiftCommand(lift, Constants.LiftConstants.kShootPos)
-      ).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos)));
+    shootHigh.onTrue(Commands.parallel(
+        Commands.waitSeconds(1.5).asProxy().andThen(new Feed(intake, 1).withTimeout(1)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2.5)));
     
- 
-   
-JoystickButton shootLow = new JoystickButton(joystick,PS4Controller.Button.kCross.value);
-shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(1),Commands.waitSeconds(0.5).andThen(new Feed(intake,1))));
-    
-//INTAKE BUTTON)
 
-    JoystickButton collectNote = new JoystickButton(joystick , PS4Controller.Button.kR1.value);
+    JoystickButton shootLow = new JoystickButton(joystick, PS4Controller.Button.kCross.value);
+    shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(1),
+        Commands.waitSeconds(0.5).andThen(new Feed(intake, 1))));
+
+    // INTAKE BUTTON)
+
+    JoystickButton collectNote = new JoystickButton(joystick, PS4Controller.Button.kR1.value);
     collectNote.whileTrue(new Collect(intake, Constants.IntakeConstants.collectSpeed));
-    
-    JoystickButton releaseNote = new JoystickButton(joystick , PS4Controller.Button.kL1.value);
+
+    JoystickButton releaseNote = new JoystickButton(joystick, PS4Controller.Button.kL1.value);
     releaseNote.whileTrue(new Feed(intake, Constants.IntakeConstants.releaseSpeed));
 
-
-    JoystickButton rotateIn = new JoystickButton(joystick , PS4Controller.Button.kL2.value);
-    //rotateFree.whileTrue(new RotateFree(intake, Constants.IntakeConstants.kMaxAbsOutputRBExtended));
+    JoystickButton rotateIn = new JoystickButton(joystick, PS4Controller.Button.kL2.value);
+    // rotateFree.whileTrue(new RotateFree(intake,
+    // Constants.IntakeConstants.kMaxAbsOutputRBExtended));
     rotateIn.onTrue(new RotateIntakeCommand(intake, 2));
 
-
-    JoystickButton rotateOut = new JoystickButton(joystick , PS4Controller.Button.kR2.value);
-     rotateOut.onTrue(new RotateIntakeCommand(intake, 55));
+    JoystickButton rotateOut = new JoystickButton(joystick, PS4Controller.Button.kR2.value);
+    rotateOut.onTrue(new RotateIntakeCommand(intake, 55));
 
     // LIFT BUTTONS
 
-    JoystickButton moveLiftUp = new JoystickButton(joystick , PS4Controller.Button.kOptions.value);
+    JoystickButton moveLiftUp = new JoystickButton(joystick, PS4Controller.Button.kOptions.value);
     moveLiftUp.whileTrue(new MoveLift(lift, Constants.LiftConstants.speed));
 
-     JoystickButton moveLiftDown = new JoystickButton(joystick , PS4Controller.Button.kShare.value);
+    JoystickButton moveLiftDown = new JoystickButton(joystick, PS4Controller.Button.kShare.value);
     moveLiftDown.whileTrue(new MoveLift(lift, -Constants.LiftConstants.speed));
 
     JoystickButton upSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value);
 
     upSoleButton.onTrue(new SolenoidDown(lift));
-    
 
     JoystickButton downSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
 
     downSoleButton.onTrue(new SolenoidUp(lift));
+
+    //JoystickButton finalSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value );
+
+    //finalSoleButton.onTrue(new SolenoidFinal(lift));
+
+    POVButton finalSol = new POVButton(joystick, 0);
+    finalSol.onTrue(new SolenoidFinal(lift));
+
+    POVButton retractfinalSol = new POVButton(joystick, 180);
+    retractfinalSol.onTrue(new RetractSolenoidFinal(lift));
+
 
     JoystickButton prepForLow = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
 
@@ -178,33 +185,118 @@ shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout
 
     endLow.onTrue(new MoveLiftCommand(lift, 0));
 
-    
-    
-     if (Utils.isSimulation()) {
+    if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
-
-  public RobotContainer() 
-  {
+  public RobotContainer() {
+    lift.setLiftEncoder(0);
     intake.resetRotateEncoder();
-    lift.resetLiftEncoder();
     shooter.resetShooterEncoder();
-   
-    //AutoBuilder.buildAutoChooser();
-    //SmartDashboard.putData("Sendable Chooser", m_chooser);
-   
+
+    m_chooser.addOption("BlueAutoLeftSpeaker", blueAutoLeftSpeaker());
+    m_chooser.addOption("BlueAutoCenterSpeaker", blueAutoCenterSpeaker());
+    m_chooser.addOption("BlueAutoRightSpeaker", blueAutoRightSpeaker());
+    //m_chooser.addOption("17PointAuto", blueAutoCenterSpeaker17());
+    SmartDashboard.putData("Sendable Chooser", m_chooser);
+
+    
+
 
     configureBindings();
   }
 
-  public Command getAutonomousCommand() { //Uses the program from Path planner to create an autonomous code
+  private Command safetyShoot() {
+    return Commands.parallel(
+        Commands.waitSeconds(2).asProxy().andThen(new Feed(intake, 1).withTimeout(1.5)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(3.5));
+  }
+
+  private Command autoShoot() {
+    return Commands.parallel(
+        Commands.waitSeconds(1.5).asProxy().andThen(new Feed(intake, 1).withTimeout(1)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2.5));
+  }
+
+  private Command riskyShoot() {
+    return Commands.parallel(
+        Commands.waitSeconds(1.25).asProxy().andThen(new Feed(intake, 1).withTimeout(0.75)),
+        new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2));
+  }
+
+  private Command autoCenter() {
+
+    return new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(0.2)
+        .andThen(new Feed(intake, 1).withTimeout(0.2)
+            .andThen(new Collect(intake, IntakeConstants.collectSpeed).withTimeout(0.2)));
+  }
+
+  // AUTOS
+
+  private Command blueAutoLeftSpeaker() {
+
+    return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(
+            Commands.parallel(autopath1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+        .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+            Commands.parallel(autopath2,
+                Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
+        .andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(autopath3);
+
+  }
+
+  private Command blueAutoCenterSpeaker() {
+
+    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(
+            Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+        .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+            Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter())))
+        .andThen(riskyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(autopath6);
+  }
+
+  private Command blueAutoRightSpeaker() {
+
+    return safetyShoot().andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(
+            Commands.parallel(autopath8, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+        .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+            Commands.parallel(autopath9, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
+        .andThen(safetyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
+        .andThen(autopath10);
+  }
+
+  
+  /**private Command blueAutoCenterSpeaker17(){
     
-    return shootSp.andThen(new RotateIntakeCommand(intake, 55))
-    .andThen(Commands.parallel(autopath1,new Collect(intake,Constants.IntakeConstants.collectSpeed).withTimeout(3)))
-    .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-    .andThen(autopath2).andThen(shootSp).andThen(autopath3); //m_chooser.getSelected();
-}
+    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
+    .andThen( Commands.parallel(autopath4, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+    Commands.parallel(autopath5,
+    Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
+    autoCenter()))).andThen(riskyShoot()).andThen(
+    Commands.parallel(autopath7, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
+    }
+    */
+   
+
+  public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code
+    return m_chooser.getSelected();
+
+    /*
+     * autoShoot().andThen(new RotateIntakeCommand(intake, 55))
+     * .andThen(
+     * Commands.parallel(autopath1, new Collect(intake,
+     * Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+     * .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
+     * .andThen(autopath2).andThen(autoShoot()).andThen(new MoveLiftCommand(lift,
+     * LiftConstants.kUnderChainPos));
+     */
+  }
 }

@@ -44,7 +44,7 @@ public final class Constants {
         //max output at shooter class
         public static final double kMaxAbsOutput = 1;
         //max output at robot container class for high shot
-        public static final double kMaxAbsOutputRBHigh = -0.7;
+        public static final double kMaxAbsOutputRBHigh = -0.8;
         //max output at robot container class for low shot
         public static final double kMaxAbsOutputRBLow = -0.2;
        
@@ -115,7 +115,7 @@ public final class Constants {
             public static final int ButtonShare = 9;
             public static final int ButtonOption = 10;
             public static final int PSButton = 15;
-            public static final int TouchPad = 16;
+            public static final int TouchPad = 14;
             public static final int joystickPort = 0;
 
 

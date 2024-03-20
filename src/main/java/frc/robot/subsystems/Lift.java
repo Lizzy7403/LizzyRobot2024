@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Importing the SubsystemBase class from the WPILib library
 // This class provides the base for creating subsystems, which are major parts of the robot
@@ -38,6 +39,8 @@ public class Lift extends SubsystemBase {
   
   private DoubleSolenoid m_doubleSolenoid;
 
+  private Solenoid m_finalSolenoid;
+
   public Lift() {
     liftMotor = new CANSparkMax(Constants.LiftConstants.MOTOR_ID, MotorType.kBrushless);
   
@@ -45,6 +48,8 @@ public class Lift extends SubsystemBase {
     
 
     m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
+
+    m_finalSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
 
     liftEncoder = liftMotor.getEncoder();
 
@@ -62,6 +67,14 @@ public class Lift extends SubsystemBase {
 
     //output range
     pidLiftController.setOutputRange( -1 * Constants.LiftConstants.kMaxAbsOutput, Constants.LiftConstants.kMaxAbsOutput);
+  }
+
+  public void moveFinalSolenoid(){
+    m_finalSolenoid.set(true);
+  }
+
+  public void retractFinalSolenoid(){
+    m_finalSolenoid.set(false);
   }
 
   public boolean isSolenoidUp() {
@@ -88,6 +101,10 @@ public class Lift extends SubsystemBase {
 
   public void resetLiftEncoder() {
     liftEncoder.setPosition(0);
+  }
+
+  public void setLiftEncoder(double num) {
+    liftEncoder.setPosition(num);
   }
 
   public void stopLift() {
