@@ -108,8 +108,10 @@ public class RobotContainer {
   private Command autopathRedRight1 = drivetrain.getAutoPath("autopathRedRight1");
 
   // 17 pts auto paths
-  private Command autopath7 = drivetrain.getAutoPath("autopath7");
-  private Command autopath75 = drivetrain.getAutoPath("autopath75");
+  private Command autopath17Right1 = drivetrain.getAutoPath("autopath17Right1");
+  private Command autopath17Right2 = drivetrain.getAutoPath("autopath17Right2");
+  private Command autopath17Left1 = drivetrain.getAutoPath("autopath17Left1");
+  private Command autopath17Left2 = drivetrain.getAutoPath("autopath17Left2");
 
   private void configureBindings() {
 
@@ -219,10 +221,8 @@ public class RobotContainer {
     intake.resetRotateEncoder();
     shooter.resetShooterEncoder();
 
-    // m_chooser.addOption("17 point Center blue left collect / red right collect",
-    // autoCenter17BlueLeft());
-    // m_chooser.addOption("17 point Center blue right collect / red left collect",
-    // autoLeft17BlueRight());
+    m_chooser.addOption("17 point Center blue left collect / red right collect", autoCenterBlueLeft17());
+    m_chooser.addOption("17 point Center blue right collect / red left collect", autoCenterBlueRight17());
     m_chooser.addOption("12 point Blue Left / Red Right", blueAutoLeft12());
     m_chooser.addOption("12 point Center", blueAutoCenter12());
     m_chooser.addOption("12 point Blue Right / Red Left", blueAutoRight12());
@@ -359,33 +359,31 @@ public class RobotContainer {
         .andThen(autopathRight3);
   }
 
-  /**private Command autoCenterBlueRight17(){
+  private Command autoCenterBlueRight17(){
     
     return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
-    .andThen( Commands.parallel(autopath4, new Collect(intake,
+    .andThen(Commands.parallel(autopathCenter1, new Collect(intake,
     Constants.IntakeConstants.collectSpeed).withTimeout(2)))
     .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-    Commands.parallel(autopath5,
+    Commands.parallel(autopathCenter2,
     Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
     autoCenter()))).andThen(riskyShoot()).andThen(
-    Commands.parallel(autopath7, new Collect(intake,
-    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
-    }
-    */
+    Commands.parallel(autopath17Right1, new RotateIntakeCommand(intake, 55).andThen(new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2)))).andThen(Commands.parallel(autopath17Right2, new RotateIntakeCommand(intake, 0).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot());
+  }
 
-    /**private Command autoCenterBlueLeft17(){
+  private Command autoCenterBlueLeft17(){
     
     return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
-    .andThen( Commands.parallel(autopath4, new Collect(intake,
+    .andThen(Commands.parallel(autopathCenter1, new Collect(intake,
     Constants.IntakeConstants.collectSpeed).withTimeout(2)))
     .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-    Commands.parallel(autopath5,
+    Commands.parallel(autopathCenter2,
     Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
     autoCenter()))).andThen(riskyShoot()).andThen(
-    Commands.parallel(autopath7, new Collect(intake,
-    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
-    }
-    */
+    Commands.parallel(autopath17Left1, new RotateIntakeCommand(intake, 55).andThen(new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2)))).andThen(Commands.parallel(autopath17Left2, new RotateIntakeCommand(intake, 0).andThen(autoCenter()).andThen(autoCenter()))).andThen(autoShoot());
+  }
 
 
   public Command getAutonomousCommand() {
