@@ -96,8 +96,12 @@ public final class Constants {
 
         public static final double speed = 1;
 
+        public static final double kLowShootPos = -500;
         public static final double kShootPos = -350;
         public static final double kUnderChainPos = 0;
+
+        public static final double kLiftPos = -780;
+        public static final double kRetractPos = -1;
 
         
     }

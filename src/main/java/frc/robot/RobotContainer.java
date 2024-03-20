@@ -79,33 +79,37 @@ public class RobotContainer {
 
   private SendableChooser<Command> m_chooser = new SendableChooser<>();
   private Command climb = new SolenoidFinal(lift);
-  
 
+  // 12 pts auto paths
   private Command autopathLeft1 = drivetrain.getAutoPath("autopathLeft1");
   private Command autopathLeft2 = drivetrain.getAutoPath("autopathLeft2");
   private Command autopathLeft3 = drivetrain.getAutoPath("autopathLeft3");
+
+  // 7 pts auto paths
   private Command autopathLeft4 = drivetrain.getAutoPath("autopathLeft4");
-  
-  
+  private Command autopathRedLeft1 = drivetrain.getAutoPath("autopathRedLeft1");
+
+  // 12 pts auto paths
   private Command autopathCenter1 = drivetrain.getAutoPath("autopathCenter1");
   private Command autopathCenter2 = drivetrain.getAutoPath("autopathCenter2");
   private Command autopathCenter3 = drivetrain.getAutoPath("autopathCenter3");
+
+  // 7 pts auto paths
   private Command autopathCenter4 = drivetrain.getAutoPath("autopathCenter4");
-  
   private Command autopathRedCenter1 = drivetrain.getAutoPath("autopathRedCenter1");
-  
-  
-  private Command autopath7 = drivetrain.getAutoPath("autopath7");
-  private Command autopath75 = drivetrain.getAutoPath("autopath75");
-  
-  
+
+  // 12 pts auto paths
   private Command autopathRight1 = drivetrain.getAutoPath("autopathRight1");
   private Command autopathRight2 = drivetrain.getAutoPath("autopathRight2");
   private Command autopathRight3 = drivetrain.getAutoPath("autopathRight3");
 
+  // 7 pts auto paths
+  private Command autopathRight4 = drivetrain.getAutoPath("autopathRight4");
   private Command autopathRedRight1 = drivetrain.getAutoPath("autopathRedRight1");
-  
 
+  // 17 pts auto paths
+  private Command autopath7 = drivetrain.getAutoPath("autopath7");
+  private Command autopath75 = drivetrain.getAutoPath("autopath75");
 
   private void configureBindings() {
 
@@ -140,7 +144,6 @@ public class RobotContainer {
     shootHigh.onTrue(Commands.parallel(
         Commands.waitSeconds(1.5).asProxy().andThen(new Feed(intake, 1).withTimeout(1)),
         new ShootCommand(shooter, Constants.ShooterConstants.kMaxAbsOutputRBHigh).withTimeout(2.5)));
-    
 
     JoystickButton shootLow = new JoystickButton(joystick, PS4Controller.Button.kCross.value);
     shootLow.whileTrue(Commands.parallel(new ShootCommand(shooter, -0.2).withTimeout(1),
@@ -178,9 +181,18 @@ public class RobotContainer {
 
     downSoleButton.onTrue(new SolenoidUp(lift));
 
-    //JoystickButton finalSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value );
+    POVButton upLiftButton = new POVButton(joystick, 90);
 
-    //finalSoleButton.onTrue(new SolenoidFinal(lift));
+    upLiftButton.onTrue(new MoveLiftCommand(lift, Constants.LiftConstants.kLiftPos));
+
+    POVButton downLiftButton = new POVButton(joystick, 270);
+
+    downLiftButton.onTrue(new MoveLiftCommand(lift, Constants.LiftConstants.kRetractPos));
+
+    // JoystickButton finalSoleButton = new JoystickButton(joystick,
+    // PS4Controller.Button.kSquare.value );
+
+    // finalSoleButton.onTrue(new SolenoidFinal(lift));
 
     POVButton finalSol = new POVButton(joystick, 0);
     finalSol.onTrue(new SolenoidFinal(lift));
@@ -188,14 +200,13 @@ public class RobotContainer {
     POVButton retractfinalSol = new POVButton(joystick, 180);
     retractfinalSol.onTrue(new RetractSolenoidFinal(lift));
 
-
     JoystickButton prepForLow = new JoystickButton(joystick, PS4Controller.Button.kR3.value);
 
-    prepForLow.onTrue(new MoveLiftCommand(lift, -500));
+    prepForLow.onTrue(new MoveLiftCommand(lift, Constants.LiftConstants.kLowShootPos));
 
     JoystickButton endLow = new JoystickButton(joystick, PS4Controller.Button.kL3.value);
 
-    endLow.onTrue(new MoveLiftCommand(lift, 0));
+    endLow.onTrue(new MoveLiftCommand(lift, Constants.LiftConstants.kUnderChainPos));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
@@ -208,19 +219,20 @@ public class RobotContainer {
     intake.resetRotateEncoder();
     shooter.resetShooterEncoder();
 
-    //m_chooser.addOption("17 point Center blue left collect / red right collect", autoCenter17BlueLeft());
-    //m_chooser.addOption("17 point Center blue right collect / red left collect", autoLeft17BlueRight());
+    // m_chooser.addOption("17 point Center blue left collect / red right collect",
+    // autoCenter17BlueLeft());
+    // m_chooser.addOption("17 point Center blue right collect / red left collect",
+    // autoLeft17BlueRight());
     m_chooser.addOption("12 point Blue Left / Red Right", blueAutoLeft12());
     m_chooser.addOption("12 point Center", blueAutoCenter12());
     m_chooser.addOption("12 point Blue Right / Red Left", blueAutoRight12());
     m_chooser.addOption("7 point Blue Left", blueAutoLeft7());
-    m_chooser.addOption("7 point Red Right", redAutoRight7());
     m_chooser.addOption("7 point Blue Center", blueAutoCenter7());
+    m_chooser.addOption("7 point Blue Right", blueAutoRight7());
+    m_chooser.addOption("7 point Red Left", redAutoLeft7());
     m_chooser.addOption("7 point Red Center", redAutoCenter7());
+    m_chooser.addOption("7 point Red Right", redAutoRight7());
     SmartDashboard.putData("Sendable Chooser", m_chooser);
-
-    
-
 
     configureBindings();
   }
@@ -244,7 +256,6 @@ public class RobotContainer {
   }
 
   private Command autoCenter() {
-
     return new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(0.2)
         .andThen(new Feed(intake, 1).withTimeout(0.2)
             .andThen(new Collect(intake, IntakeConstants.collectSpeed).withTimeout(0.2)));
@@ -252,20 +263,31 @@ public class RobotContainer {
 
   // AUTOS
 
-  private Command blueAutoLeft7() {
-   return safetyShoot()
-        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
-        .andThen(Commands.parallel(autopathLeft4, 
-        Commands.waitSeconds(3)
-        .andThen(new RotateIntakeCommand(intake, 55))
-        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+  private Command redAutoLeft7() {
+    return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts)) // Wait for 7 seconds
+        .andThen(Commands.parallel(redAutoLeft7(),
+            Commands.waitSeconds(3)
+                .andThen(new RotateIntakeCommand(intake, 55))
+                .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
         .andThen(new RotateIntakeCommand(intake, 0));
-}
+  }
+
+  private Command blueAutoLeft7() {
+    return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts)) // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathLeft4,
+            Commands.waitSeconds(3)
+                .andThen(new RotateIntakeCommand(intake, 55))
+                .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(new RotateIntakeCommand(intake, 0));
+  }
 
   private Command blueAutoLeft12() {
     return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
-            Commands.parallel(autopathLeft1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+            Commands.parallel(autopathLeft1,
+                new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
             Commands.parallel(autopathLeft2,
                 Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
@@ -276,65 +298,97 @@ public class RobotContainer {
 
   private Command blueAutoCenter7() {
     return safetyShoot()
-        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
-        .andThen(Commands.parallel(autopathCenter4, 
-        Commands.waitSeconds(3)
-        .andThen(new RotateIntakeCommand(intake, 55))
-        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts)) // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathCenter4,
+            Commands.waitSeconds(3)
+                .andThen(new RotateIntakeCommand(intake, 55))
+                .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
         .andThen(new RotateIntakeCommand(intake, 0));
-}
+  }
 
-private Command redAutoCenter7() {
+  private Command redAutoCenter7() {
     return safetyShoot()
-        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
-        .andThen(Commands.parallel(autopathRedCenter1, 
-        Commands.waitSeconds(3)
-        .andThen(new RotateIntakeCommand(intake, 55))
-        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts)) // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathRedCenter1,
+            Commands.waitSeconds(3)
+                .andThen(new RotateIntakeCommand(intake, 55))
+                .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
         .andThen(new RotateIntakeCommand(intake, 0));
-}
+  }
 
   private Command blueAutoCenter12() {
     return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
-            Commands.parallel(autopathCenter1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+            Commands.parallel(autopathCenter1,
+                new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
             Commands.parallel(autopathCenter2, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter())))
         .andThen(riskyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
         .andThen(autopathCenter3);
   }
 
-private Command redAutoRight7() {
+  private Command redAutoRight7() {
     return safetyShoot()
-        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
-        .andThen(Commands.parallel(autopathRedRight1, 
-        Commands.waitSeconds(3)
-        .andThen(new RotateIntakeCommand(intake, 55))
-        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts)) // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathRedRight1,
+            Commands.waitSeconds(3)
+                .andThen(new RotateIntakeCommand(intake, 55))
+                .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
         .andThen(new RotateIntakeCommand(intake, 0));
-}
+  }
+
+  private Command blueAutoRight7() {
+    return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts)) // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathRight4,
+            Commands.waitSeconds(3)
+                .andThen(new RotateIntakeCommand(intake, 55))
+                .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(new RotateIntakeCommand(intake, 0));
+  }
+
   private Command blueAutoRight12() {
     return safetyShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
-            Commands.parallel(autopathRight1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+            Commands.parallel(autopathRight1,
+                new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-            Commands.parallel(autopathRight2, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
+            Commands.parallel(autopathRight2,
+                Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
         .andThen(safetyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
         .andThen(autopathRight3);
   }
 
+  /**private Command autoCenterBlueRight17(){
+    
+    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
+    .andThen( Commands.parallel(autopath4, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+    Commands.parallel(autopath5,
+    Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
+    autoCenter()))).andThen(riskyShoot()).andThen(
+    Commands.parallel(autopath7, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
+    }
+    */
 
-  public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code
+    /**private Command autoCenterBlueLeft17(){
+    
+    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
+    .andThen( Commands.parallel(autopath4, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
+    Commands.parallel(autopath5,
+    Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
+    autoCenter()))).andThen(riskyShoot()).andThen(
+    Commands.parallel(autopath7, new Collect(intake,
+    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
+    }
+    */
+
+
+  public Command getAutonomousCommand() {
     return m_chooser.getSelected();
-
-    /*
-     * autoShoot().andThen(new RotateIntakeCommand(intake, 55))
-     * .andThen(
-     * Commands.parallel(autopath1, new Collect(intake,
-     * Constants.IntakeConstants.collectSpeed).withTimeout(2)))
-     * .andThen(new RotateIntakeCommand(intake, 0).withTimeout(2))
-     * .andThen(autopath2).andThen(autoShoot()).andThen(new MoveLiftCommand(lift,
-     * LiftConstants.kUnderChainPos));
-     */
   }
 }
