@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.MoveLiftCommand;
@@ -82,17 +81,30 @@ public class RobotContainer {
   private Command climb = new SolenoidFinal(lift);
   
 
-  private Command autopath1 = drivetrain.getAutoPath("autopath1");
-  private Command autopath2 = drivetrain.getAutoPath("autopath2");
-  private Command autopath3 = drivetrain.getAutoPath("autopath3");
-  private Command autopath4 = drivetrain.getAutoPath("autopath4");
-  private Command autopath5 = drivetrain.getAutoPath("autopath5");
-  private Command autopath6 = drivetrain.getAutoPath("autopath6");
+  private Command autopathLeft1 = drivetrain.getAutoPath("autopathLeft1");
+  private Command autopathLeft2 = drivetrain.getAutoPath("autopathLeft2");
+  private Command autopathLeft3 = drivetrain.getAutoPath("autopathLeft3");
+  private Command autopathLeft4 = drivetrain.getAutoPath("autopathLeft4");
+  
+  
+  private Command autopathCenter1 = drivetrain.getAutoPath("autopathCenter1");
+  private Command autopathCenter2 = drivetrain.getAutoPath("autopathCenter2");
+  private Command autopathCenter3 = drivetrain.getAutoPath("autopathCenter3");
+  private Command autopathCenter4 = drivetrain.getAutoPath("autopathCenter4");
+  
+  private Command autopathRedCenter1 = drivetrain.getAutoPath("autopathRedCenter1");
+  
+  
   private Command autopath7 = drivetrain.getAutoPath("autopath7");
   private Command autopath75 = drivetrain.getAutoPath("autopath75");
-  private Command autopath8 = drivetrain.getAutoPath("autopath8");
-  private Command autopath9 = drivetrain.getAutoPath("autopath9");
-  private Command autopath10 = drivetrain.getAutoPath("autopath10");
+  
+  
+  private Command autopathRight1 = drivetrain.getAutoPath("autopathRight1");
+  private Command autopathRight2 = drivetrain.getAutoPath("autopathRight2");
+  private Command autopathRight3 = drivetrain.getAutoPath("autopathRight3");
+
+  private Command autopathRedRight1 = drivetrain.getAutoPath("autopathRedRight1");
+  
 
 
   private void configureBindings() {
@@ -196,10 +208,15 @@ public class RobotContainer {
     intake.resetRotateEncoder();
     shooter.resetShooterEncoder();
 
-    m_chooser.addOption("BlueAutoLeftSpeaker", blueAutoLeftSpeaker());
-    m_chooser.addOption("BlueAutoCenterSpeaker", blueAutoCenterSpeaker());
-    m_chooser.addOption("BlueAutoRightSpeaker", blueAutoRightSpeaker());
-    //m_chooser.addOption("17PointAuto", blueAutoCenterSpeaker17());
+    //m_chooser.addOption("17 point Center blue left collect / red right collect", autoCenter17BlueLeft());
+    //m_chooser.addOption("17 point Center blue right collect / red left collect", autoLeft17BlueRight());
+    m_chooser.addOption("12 point Blue Left / Red Right", blueAutoLeft12());
+    m_chooser.addOption("12 point Center", blueAutoCenter12());
+    m_chooser.addOption("12 point Blue Right / Red Left", blueAutoRight12());
+    m_chooser.addOption("7 point Blue Left", blueAutoLeft7());
+    m_chooser.addOption("7 point Red Right", redAutoRight7());
+    m_chooser.addOption("7 point Blue Center", blueAutoCenter7());
+    m_chooser.addOption("7 point Red Center", redAutoCenter7());
     SmartDashboard.putData("Sendable Chooser", m_chooser);
 
     
@@ -235,56 +252,77 @@ public class RobotContainer {
 
   // AUTOS
 
-  private Command blueAutoLeftSpeaker() {
+  private Command blueAutoLeft7() {
+   return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathLeft4, 
+        Commands.waitSeconds(3)
+        .andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(new RotateIntakeCommand(intake, 0));
+}
 
+  private Command blueAutoLeft12() {
     return autoShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
-            Commands.parallel(autopath1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
+            Commands.parallel(autopathLeft1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(2)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-            Commands.parallel(autopath2,
+            Commands.parallel(autopathLeft2,
                 Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
         .andThen(autoShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
-        .andThen(autopath3);
+        .andThen(autopathLeft3);
 
   }
 
-  private Command blueAutoCenterSpeaker() {
+  private Command blueAutoCenter7() {
+    return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathCenter4, 
+        Commands.waitSeconds(3)
+        .andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(new RotateIntakeCommand(intake, 0));
+}
 
+private Command redAutoCenter7() {
+    return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathRedCenter1, 
+        Commands.waitSeconds(3)
+        .andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(new RotateIntakeCommand(intake, 0));
+}
+
+  private Command blueAutoCenter12() {
     return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
-            Commands.parallel(autopath4, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+            Commands.parallel(autopathCenter1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-            Commands.parallel(autopath5, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter())))
+            Commands.parallel(autopathCenter2, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter())))
         .andThen(riskyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
-        .andThen(autopath6);
+        .andThen(autopathCenter3);
   }
 
-  private Command blueAutoRightSpeaker() {
-
+private Command redAutoRight7() {
+    return safetyShoot()
+        .andThen(Commands.waitSeconds(Constants.AutoConstants.kWaitTime7Pts))  // Wait for 7 seconds
+        .andThen(Commands.parallel(autopathRedRight1, 
+        Commands.waitSeconds(3)
+        .andThen(new RotateIntakeCommand(intake, 55))
+        .andThen(new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5))))
+        .andThen(new RotateIntakeCommand(intake, 0));
+}
+  private Command blueAutoRight12() {
     return safetyShoot().andThen(new RotateIntakeCommand(intake, 55))
         .andThen(
-            Commands.parallel(autopath8, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
+            Commands.parallel(autopathRight1, new Collect(intake, Constants.IntakeConstants.collectSpeed).withTimeout(1.5)))
         .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-            Commands.parallel(autopath9, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
+            Commands.parallel(autopathRight2, Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(autoCenter())))
         .andThen(safetyShoot()).andThen(new MoveLiftCommand(lift, LiftConstants.kUnderChainPos))
-        .andThen(autopath10);
+        .andThen(autopathRight3);
   }
 
-  
-  /**private Command blueAutoCenterSpeaker17(){
-    
-    return riskyShoot().andThen(new RotateIntakeCommand(intake, 55))
-    .andThen( Commands.parallel(autopath4, new Collect(intake,
-    Constants.IntakeConstants.collectSpeed).withTimeout(2)))
-    .andThen(new RotateIntakeCommand(intake, 0)).andThen(
-    Commands.parallel(autopath5,
-    Commands.waitSeconds(1).andThen(autoCenter()).andThen(autoCenter()).andThen(
-    autoCenter()))).andThen(riskyShoot()).andThen(
-    Commands.parallel(autopath7, new Collect(intake,
-    Constants.IntakeConstants.collectSpeed).withTimeout(2))).andThen(Commands.parallel(autopath75, autoCenter().andThen(autoCenter()))).andThen(autoShoot());
-    }
-    */
-   
 
   public Command getAutonomousCommand() { // Uses the program from Path planner to create an autonomous code
     return m_chooser.getSelected();

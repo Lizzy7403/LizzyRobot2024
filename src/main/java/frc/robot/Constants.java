@@ -2,6 +2,10 @@ package frc.robot;
 
 public final class Constants {
 
+    public static final class AutoConstants{
+        public static final double kWaitTime7Pts = 7;
+    }
+
     public static final class IntakeConstants
     {
        
@@ -128,9 +132,4 @@ public final class Constants {
 
     }
 
-    // Constantes del ejemplo auto, las cuales deben de estar especificadas a cada robot
-    public static final class AutoConstants 
-    { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
-      
-    }
 }
