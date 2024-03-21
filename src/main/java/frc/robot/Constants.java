@@ -24,10 +24,10 @@ public final class Constants {
         public static final double kRotationSetpointLow = 0;
 
         //max output of the feeder
-        public static final double kMaxFeedOutput = 0.3;
+        public static final double kMaxFeedOutput = 1;
 
         //max output at intake class
-        public static final double kMaxAbsOutput = 0.75;
+        public static final double kMaxAbsOutput = 1;
 
         //max output at robot container class
         public static final double kMaxAbsOutputRBExtended = 0.7;

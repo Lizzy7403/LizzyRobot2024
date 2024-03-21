@@ -39,7 +39,7 @@ public class Lift extends SubsystemBase {
   
   private DoubleSolenoid m_doubleSolenoid;
 
-  private Solenoid m_finalSolenoid;
+  private DoubleSolenoid m_finalSolenoid;
 
   public Lift() {
     liftMotor = new CANSparkMax(Constants.LiftConstants.MOTOR_ID, MotorType.kBrushless);
@@ -49,7 +49,7 @@ public class Lift extends SubsystemBase {
 
     m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
 
-    m_finalSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
+    m_finalSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2,3);
 
     liftEncoder = liftMotor.getEncoder();
 
@@ -70,11 +70,11 @@ public class Lift extends SubsystemBase {
   }
 
   public void moveFinalSolenoid(){
-    m_finalSolenoid.set(true);
+    m_finalSolenoid.set(DoubleSolenoid.Value.kForward);
   }
 
   public void retractFinalSolenoid(){
-    m_finalSolenoid.set(false);
+    m_finalSolenoid.set(DoubleSolenoid.Value.kReverse);
   }
 
   public boolean isSolenoidUp() {

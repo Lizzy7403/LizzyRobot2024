@@ -48,12 +48,9 @@ public class Collect extends Command {
     
     intake.spinIntake(0);
     
-      //if(intake.getLimitSwitch()){
-    //new RotateIntakeCommand(intake, 2).schedule();
-    //new CenterNote(intake).schedule();*/
-      //}
+   
         }
-      //  intake.spinIntake(0); // Stop the intake roller when the command ends
+     
     
 
     // The isFinished method is called to determine when the command is finished

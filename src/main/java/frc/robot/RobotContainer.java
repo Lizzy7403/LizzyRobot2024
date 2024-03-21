@@ -137,10 +137,10 @@ public class RobotContainer {
     // INTAKE BUTTON)
 
     JoystickButton collectNote = new JoystickButton(joystick, PS4Controller.Button.kR1.value);
-    collectNote.whileTrue(new Collect(intake, Constants.IntakeConstants.collectSpeed));
+    collectNote.whileTrue(new Collect(intake, -1));// Constants.IntakeConstants.collectSpeed));
 
     JoystickButton releaseNote = new JoystickButton(joystick, PS4Controller.Button.kL1.value);
-    releaseNote.whileTrue(new Feed(intake, Constants.IntakeConstants.releaseSpeed));
+    releaseNote.whileTrue(new Feed(intake, 1));//Constants.IntakeConstants.releaseSpeed));
 
     JoystickButton rotateIn = new JoystickButton(joystick, PS4Controller.Button.kL2.value);
     // rotateFree.whileTrue(new RotateFree(intake,
@@ -158,11 +158,11 @@ public class RobotContainer {
     JoystickButton moveLiftDown = new JoystickButton(joystick, PS4Controller.Button.kShare.value);
     moveLiftDown.whileTrue(new MoveLift(lift, -Constants.LiftConstants.speed));
 
-    JoystickButton upSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value);
+    JoystickButton upSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
 
     upSoleButton.onTrue(new SolenoidDown(lift));
 
-    JoystickButton downSoleButton = new JoystickButton(joystick, PS4Controller.Button.kTriangle.value);
+    JoystickButton downSoleButton = new JoystickButton(joystick, PS4Controller.Button.kSquare.value);
 
     downSoleButton.onTrue(new SolenoidUp(lift));
 
