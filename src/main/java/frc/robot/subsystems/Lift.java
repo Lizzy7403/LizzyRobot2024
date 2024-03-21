@@ -90,7 +90,7 @@ public class Lift extends SubsystemBase {
   }
 
   public void moveLift(double speed){
-    if(getLiftEncoderPostion() >= 0 && getLiftEncoderPostion() <= -780){
+    if(getLiftEncoderPostion() <= 0 && getLiftEncoderPostion() >= -780){
       liftMotor.set(speed);
     }
   }
